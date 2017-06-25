@@ -1,0 +1,119 @@
+@CHARSET "UTF-8";
+
+.panel-default>.panel-heading {
+	/* 	background: #222;
+	color: #dedede;
+	border: 0; */
+	
+}
+
+.page-header i {
+	color: #3ca5ff;
+}
+
+.my-panel-body {
+	/* 	min-height: 540px; */
+	/* 	min-height: 675px; */
+	min-height: 475px;
+}
+
+.table-responsive {
+	overflow: hidden;
+}
+/* check box col */
+.table-1-body-row td:nth-child(1) input[type="checkbox"] {
+	margin-top: 3px;
+}
+
+.table-1-body-row td:nth-child(1) label {
+	line-height: 52px;
+}
+
+.table-1-body-row td:nth-child(2), .table-1-body-row td:nth-child(3),
+	.table-1-body-row td:nth-child(4), .table-1-body-row td:nth-child(6) {
+	line-height: 42px;
+}
+/* check box col */
+.table-1-head-row th:nth-child(1), .table-1-body-row td:nth-child(1) {
+	min-width: 45px;
+	width: 60px;
+}
+
+/* tname col */
+.table-1-head-row th:nth-child(2), .table-1-body-row td:nth-child(2) {
+	min-width: 150px;
+	width: 155px;
+}
+
+/* tmanager col */
+.table-1-head-row th:nth-child(3), .table-1-body-row td:nth-child(3) {
+	min-width: 100px;
+	width: 110px;
+}
+
+/* ttel col */
+.table-1-head-row th:nth-child(4), .table-1-body-row td:nth-child(4) {
+	width: 130px;
+}
+
+@media screen and (max-width: 1100px) {
+	.table-1-head-row th:nth-child(4), .table-1-body-row td:nth-child(4) {
+		width: inherit;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	/* tmanager col */
+	.table-1-head-row th:nth-child(3), .table-1-body-row td:nth-child(3) {
+		width: inherit;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	/* tname col */
+	.table-1-head-row th:nth-child(2), .table-1-body-row td:nth-child(2) {
+		width: inherit;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+}
+
+@media screen and (max-width: 767px) {
+	.table-1-head-row th:nth-child(6), .table-1-body-row td:nth-child(6) {
+		display: none;
+	}
+}
+
+/* addr col */
+.table-1-head-row th:nth-child(5), .table-1-body-row td:nth-child(5) {
+	
+}
+/* button col */
+.table-1-head-row th:nth-child(6), .table-1-body-row td:nth-child(6) {
+	min-width: 100px;
+	width: 110px;
+}
+/* button col */
+.table-1-body-row td:nth-child(6) button {
+	font-size: 12px;
+	border-radius: 25px;
+	padding: 5px 8px 3px;
+	/* background: #00ff37; */
+	/* border: 1px solid #3bce0c; */
+}
+/* body taddr_num ,taddr_str col */
+.table-1-body-row td:nth-child(5) p {
+	text-align: left;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	margin: 3px 0 0px;
+
+	/* 	max-width: 300px; */
+}
+
+.table-1-body-row td:nth-child(5) p span:FIRST-CHILD {
+	width: 50px;
+	display: inline-block;
+}

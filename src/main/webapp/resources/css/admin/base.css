@@ -1,0 +1,110 @@
+@CHARSET "UTF-8";
+
+#page-wrapper {
+	min-height: 900px;
+}
+
+.btn-submit {
+	background: #333;
+	color: #dedede;
+}
+
+.form-group {
+	margin-bottom: 10px;
+}
+
+.page-header small {
+	margin-left: 20px;
+}
+
+.help-block {
+	padding-left: 5px;
+	color: red;
+	margin: 0;
+	visibility: hidden;
+}
+
+.form-group label {
+	padding-left: 5px;
+}
+
+.pager-box {
+	background: transparent;
+	text-align: center;
+}
+
+.pager-box ul {
+	margin: 0
+}
+
+.pagination>li>a, .pagination>li>span {
+	border: 0
+}
+
+.btn, .form-control, .panel {
+	border-radius: 2px;
+}
+
+.table-control-btn-box {
+	margin-bottom: 40px;
+}
+
+.panel-footer .btn {
+	padding: 7px 12px;
+}
+
+.table-1-head-row th, .table-1-body-row td {
+	text-align: center;
+}
+
+.table-1-body-row td:nth-child(1) {
+	padding: 0
+}
+
+table>thead>tr>th:FIRST-CHILD {
+	border-top-left-radius: 2px;
+}
+
+table>thead>tr>th:last-child {
+	border-top-right-radius: 2px;
+}
+
+table>tbody>tr:last-child>td:FIRST-CHILD {
+	border-bottom-left-radius: 2px;
+}
+
+table>tbody>tr:last-child>td:last-child {
+	border-bottom-right-radius: 2px;
+}
+
+table {
+	table-layout: fixed;
+	font-size: 13px;
+}
+
+.table>thead>tr {
+	background: #222;
+	color: #fff;
+}
+
+.table>thead>tr>th {
+	padding: 10px 0;
+	font-weight: lighter;
+}
+/* check box col */
+.table-1-body-row td:nth-child(1) input[type="checkbox"] {
+	vertical-align: middle;
+	margin: 0;
+}
+
+.table-1-body-row td:nth-child(1) label {
+	display: block;
+	margin-bottom: 0px;
+}
+
+.divider1:BEFORE {
+	content: "|";
+	padding: 0 15px 0 0px;
+	color: gray;
+}
+/* -------------------------------------------------------------------- */
