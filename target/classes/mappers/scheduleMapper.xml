@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.ebox.mapper.ScheduleMapper">
+
+
+
+	<resultMap type="ScheduleVO" id="ScheduleResultMap">
+		<id property="schNo" column="schNo" />
+		<result property="schStart" column="schStart" />
+		<result property="schEnd" column="schEnd" />
+		<result property="schDate" column="schDate" />
+		<result property="schType" column="schType" />
+		
+		<association property="audi" column="refAno" resultMap="kr.co.ebox.mapper.AudiMapper.AudiResultMap" />
+		<association property="screen" column="refScrno" resultMap="kr.co.ebox.mapper.ScreenMapper.ScreenResultMap" />
+	</resultMap>
+
+
+<!--  상영스케줄
+CREATE TABLE tbl_schedule (
+	schNo    INT         NOT NULL,  스케줄번호
+	schStart VARCHAR(10) NULL,      시작
+	schEnd   VARCHAR(10) NULL,      종료
+	schDate  DATE        NULL,      상영 날짜
+	schType  VARCHAR(10) NULL,      시간대
+	refAno   INT         NOT NULL,  상영관번호
+	refScrno INT         NOT NULL   스크린번호
+)
+ -->
+
+	<insert id="insert">
+		
+		INSERT INTO
+			tbl_schedule ( schStart, schEnd, schDate, schType, refAno, refScrno )
+		VALUES
+			( #{schStart}, #{schEnd}, #{schDate}, #{schType}, #{audi.aNo}, #{screen.scrNo} )
+
+	</insert>
+	
+	<insert id="insertList">
+	
+		INSERT INTO 
+			tbl_schedule ( schStart, schEnd, schDate, schType, refAno, refScrno )
+		VALUES
+		<foreach item="schedule" collection="list" separator=",">
+			( #{schedule.schStart}, #{schedule.schEnd}, #{schedule.schDate}, #{schedule.schType}, #{schedule.audi.aNo}, #{schedule.screen.scrNo} )
+		</foreach>
+			
+	</insert>
+	
+	<delete id="delete">
+	
+		DELETE FROM 
+			tbl_schedule 
+		WHERE 
+			schNo=#{schNo}
+			
+	</delete>
+	
+
+	
+	<update id="update">
+	
+		UPDATE
+			tbl_schedule
+		SET
+			schStart=#{schStart}, 	schEnd=#{schEnd}, 
+			schDate=#{schDate},		schType=#{schType},		
+			refAno=#{refAno},		refScrno=#{refScrno}
+		WHERE
+			schNo=#{schNo}
+			
+	</update>
+
+	<select id="selectById" resultMap="ScheduleResultMap">
+	
+		SELECT 
+			S.*, R.* 
+		FROM 
+			(
+				SELECT 
+					SCH.*, SCR.*, M.*    
+				FROM 
+					tbl_schedule AS SCH, tbl_screen AS SCR, tbl_movie AS M 
+				WHERE 
+					 SCR.scrno = SCH.refScrno  AND M.mno = SCR.refMno   
+			) AS S
+	 	LEFT JOIN 
+			(
+				SELECT 
+					A.*, T.* 
+				FROM 
+					tbl_audi AS A, tbl_theater AS T 
+				WHERE A.refTno = T.tNo
+			) AS R 
+		ON 
+			S.refAno = R.aNo 
+		WHERE 
+			S.schNo=#{schNo}
+		
+	</select>
+	
+	<select id="selectByAno" resultMap="ScheduleResultMap">
+	
+		SELECT 
+			S.*, R.* 
+		FROM 
+			(
+				SELECT 
+					SCH.*, SCR.*, M.*    
+				FROM 
+					tbl_schedule AS SCH, tbl_screen AS SCR, tbl_movie AS M 
+				WHERE 
+					 SCR.scrNo = SCH.refScrno  
+					AND 
+					 M.mno = SCR.refMno 
+					AND 
+					 SCH.schDate <![CDATA[>=]]> #{start} 
+					AND 
+					 SCH.schDate <![CDATA[<]]> #{end}   
+			) AS S
+	 	LEFT JOIN 
+			(
+				SELECT 
+					A.*, T.* 
+				FROM 
+					tbl_audi AS A, tbl_theater AS T 
+				WHERE 
+					T.tNo = A.refTno
+			) AS R 
+		ON 
+			S.refAno = R.aNo 
+		WHERE 
+			S.refAno=#{aNo} 
+		
+	</select>
+	
+	<select id="selectAll" resultMap="ScheduleResultMap">
+	
+		SELECT
+			sch.*, audi.*, scr.*
+		FROM
+			tbl_schedule AS sch
+				LEFT JOIN 
+			 		tbl_audi AS audi  
+				ON 
+					sch.refAno = audi.ano
+				LEFT JOIN 
+			 		(SELECT * FROM tbl_screen AS scr, tbl_movie AS mo WHERE scr.refMno=mo.mno) AS scr  
+				ON 
+					sch.refScrno = scr.scrNo  
+		
+	</select>
+
+	
+	<select id="selectListForBooking" resultMap="ScheduleResultMap">
+	
+		SELECT 
+			S.*, R.* 
+		FROM 
+			(
+				SELECT 
+					SCH.*, SCR.*, M.*    
+				FROM 
+					tbl_schedule AS SCH, tbl_screen AS SCR, tbl_movie AS M 
+				WHERE 
+					SCH.refscrno = SCR.scrno AND SCR.refmno = M.mno AND sch.schDate = #{selDate}
+			) AS S
+	 	LEFT JOIN 
+			(
+				SELECT 
+					A.*, T.* 
+				FROM 
+					tbl_audi AS A, tbl_theater AS T 
+				WHERE A.ref_tno = T.tno
+			) AS R 
+		ON 
+			S.refano = R.ano 
+		WHERE 
+			R.tno = #{tno} 
+		<if test="mno != 0">
+			AND S.mno = #{mno}
+		</if>
+		<if test="isGroupByMnm">
+		GROUP BY 
+			 S.mNm
+		</if>
+		
+		
+		  
+			
+	</select>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+

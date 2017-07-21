@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.ebox.mapper.ScreenMapper">
+
+	<resultMap type="ScreenVO" id="ScreenResultMap">
+		<id property="scrNo" column="scrNo" />
+		<result property="scrType" column="scrType" />
+		<result property="scrBuyDt" column="scrBuyDt" />
+		<result property="scrPrice" column="scrPrice" />
+		<result property="scrSdate" column="scrSdate" />
+		<result property="scrEdate" column="scrEdate" />
+		<association property="movie" column="refMno" resultMap="kr.co.ebox.mapper.MovieMapper.MovieResultMap" />
+	</resultMap>
+
+
+	<insert id="insert">
+		
+		INSERT INTO
+			tbl_screen ( scrType, scrBuyDt, scrPrice, scrSdate, scrEdate, refMno )
+		VALUES
+			( #{scrType}, #{scrBuyDt}, #{scrPrice}, #{scrSdate}, #{scrEdate}, #{movie.mNo} )
+
+	</insert>
+	
+	<delete id="delete">
+	
+		DELETE FROM 
+			tbl_screen 
+		WHERE 
+			scrNo=#{scrNo}
+			
+	</delete>
+	
+	<update id="update">
+	
+		UPDATE
+			tbl_screen
+		SET
+			scrType=#{scrType}, 	scrBuyDt=#{scrBuyDt}, 
+			scrPrice=#{scrPrice},	scrSdate=#{scrSdate},
+			scrEdate=#{scrEdate},	refMno=#{movie.mno}
+		WHERE
+			scrNo=#{scrNo}
+			
+	</update>
+	
+	<select id="selectById" resultMap="ScreenResultMap">
+	
+		SELECT
+			scr.*, mo.*
+		FROM
+			tbl_screen AS scr
+				LEFT JOIN 
+			 		tbl_movie AS mo  
+				ON 
+					scr.refMno = mo.mNo 
+		WHERE
+			scr.scrNo=#{scrNo}	
+		
+	</select>
+	
+	
+
+	<select id="selectWithQnty" resultMap="ScreenResultMap" parameterType="int">
+	
+		SELECT
+			scr.*, mo.*
+		FROM
+			tbl_screen AS scr
+				LEFT JOIN 
+			 		tbl_movie AS mo  
+				ON 
+					scr.refMno = mo.mNo 
+		ORDER BY
+			scr.scrNo DESC
+		LIMIT
+			#{qnty}
+			
+	</select>
+	
+	<select id="selectWithCri" resultMap="ScreenResultMap">
+
+		SELECT
+			scr.*, mo.*
+		FROM
+				tbl_screen AS scr 
+			LEFT JOIN 
+			 	tbl_movie AS mo 
+			ON 
+				scr.refMno = mo.mNo 
+		<include refid="searchOne" />
+		ORDER BY
+			scr.scrNo DESC
+		LIMIT
+			#{pageStart},#{perPageNum}
+
+	</select>
+	<select id="selectWithCriForInputList" resultMap="ScreenResultMap">
+
+		SELECT
+			scr.*, mo.*
+		FROM
+				tbl_screen AS scr 
+			LEFT JOIN 
+			 	tbl_movie AS mo 
+			ON 
+				scr.refMno = mo.mNo 
+		<include refid="searchTwo" />
+		ORDER BY
+			scr.scrNo DESC
+		LIMIT
+			#{pageStart},#{perPageNum}
+
+	</select>
+	
+	<select id="countPaging" resultType="int">
+
+		SELECT
+			count(scr.scrNo)
+		FROM
+				tbl_screen AS scr 
+			LEFT JOIN 
+			 	tbl_movie AS mo 
+			ON 
+				scr.refMno = mo.mno 
+		<include refid="searchOne" />
+		ORDER BY
+			scr.scrNo DESC
+
+	</select>
+	
+	<select id="countPagingForInputList" resultType="int">
+
+		SELECT
+			count(scr.scrNo)
+		FROM
+				tbl_screen AS scr 
+			LEFT JOIN 
+			 	tbl_movie AS mo 
+			ON 
+				scr.refMno = mo.mno 
+		<include refid="searchTwo" />
+		ORDER BY
+			scr.scrNo DESC
+
+	</select>
+	
+	<sql id="searchOne">
+		<where>
+			<if test="keyword != null">
+
+			scr.scrType like concat('%',#{keyword},'%')
+			OR
+			mo.mNm like concat('%',#{keyword},'%')
+			OR
+			mo.mNmEn like concat('%',#{keyword},'%')
+			OR
+			mo.mactors like concat('%',#{keyword},'%')
+			OR
+			mo.mdirector like concat('%',#{keyword},'%')
+			OR
+			mo.genreNm like concat('%',#{keyword},'%')
+			
+			</if>
+		</where>
+	</sql>
+	
+	<sql id="searchTwo">
+		<where>
+			<if test="keyword != null">
+
+			scr.scrType like concat('%',#{keyword},'%')
+			OR
+			mo.mNm like concat('%',#{keyword},'%')
+			OR
+			mo.mNmEn like concat('%',#{keyword},'%')
+			OR
+			mo.mdirector like concat('%',#{keyword},'%')
+			
+			</if>
+		</where>
+	</sql>
+	
+</mapper>
+
+
+
+
+
+
+
+

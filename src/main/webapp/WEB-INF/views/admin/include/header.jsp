@@ -14,6 +14,9 @@
 <!-- Bootstrap 3.3.4 -->
 <link href="${pageContext.request.contextPath }/resources/bootstrap-3.3.2/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 
+<!-- jquery-ui-1.12.1 -->
+<link href="${pageContext.request.contextPath }/resources/plugins/jquery-ui-1.12.1/jquery-ui.css" rel="stylesheet">
+
 <!-- Custom CSS -->
 <link href="${pageContext.request.contextPath }/resources/admin-theme/css/sb-admin.css" rel="stylesheet">
 
@@ -23,7 +26,12 @@
 <!-- Ionicons -->
 <link href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" rel="stylesheet" type="text/css" />
 
+<!-- jQuery -->
+<script src="${pageContext.request.contextPath }/resources/plugins/jQuery/jquery-3.2.1.min.js"></script>
+
 </head>
+
+
 
 <div id="wrapper">
 
@@ -152,10 +160,30 @@
 						<li><a href="${pageContext.request.contextPath }/admin/audi">상영관</a></li>
 						<li><a href="${pageContext.request.contextPath }/admin/seat">좌석</a></li>
 					</ul></li>
-				<li><a href="index.html">
-						<i class="fa fa-fw fa-dashboard"></i> Dashboard
-					</a></li>
-				<li><a href="charts.html">
+
+				<li><a href="javascript:;" data-toggle="collapse" data-target="#movie">
+						<i class="fa fa-fw fa-arrows-v"></i> 영화 <i class="fa fa-fw fa-caret-down"></i>
+					</a>
+					<ul id="movie" class="collapse">
+						<li><a href="${pageContext.request.contextPath }/admin/movie/write">영화등록</a></li>
+						<li><a href="${pageContext.request.contextPath }/admin/movie/list">영화리스트</a></li>
+					</ul></li>
+				<li><a href="javascript:;" data-toggle="collapse" data-target="#screen">
+						<i class="fa fa-fw fa-arrows-v"></i> 스크린 <i class="fa fa-fw fa-caret-down"></i>
+					</a>
+					<ul id="screen" class="collapse">
+						<li><a href="${pageContext.request.contextPath }/admin/screen/write">스크린등록</a></li>
+						<li><a href="${pageContext.request.contextPath }/admin/screen/list">스크린리스트</a></li>
+					</ul></li>
+				<li><a href="javascript:;" data-toggle="collapse" data-target="#schedule">
+						<i class="fa fa-fw fa-arrows-v"></i> 상영스케줄 <i class="fa fa-fw fa-caret-down"></i>
+					</a>
+					
+					<ul id="schedule" class="collapse">
+						<li><a href="${pageContext.request.contextPath }/admin/schedule/write">상영스케줄등록</a></li>
+						<li><a href="${pageContext.request.contextPath }/admin/schedule/list">상영스케줄리스트</a></li>
+					</ul></li>
+				<!--<li><a href="charts.html">
 						<i class="fa fa-fw fa-bar-chart-o"></i> Charts
 					</a></li>
 				<li><a href="tables.html">
@@ -182,7 +210,7 @@
 					</a></li>
 				<li><a href="index-rtl.html">
 						<i class="fa fa-fw fa-dashboard"></i> RTL Dashboard
-					</a></li>
+					</a></li> -->
 			</ul>
 		</div>
 		<!-- /.navbar-collapse -->

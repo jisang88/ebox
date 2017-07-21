@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.ebox.mapper.AudiMapper">
+	
+	<resultMap type="AuditoriumVO" id="AudiResultMap">
+		<id property="aNo" column="aNo" />
+		<result property="aName" column="aName" />
+		<result property="aSType" column="aSType" />
+		<result property="aVType" column="aVType" />
+		<result property="aTheme" column="aTheme" />
+		<result property="aThemeSubInfo" column="aThemeSubInfo" />
+		<result property="floor" column="floor" />
+		<association property="theater" resultMap="kr.co.ebox.mapper.TheaterMapper.TheaterResultMap" />
+	</resultMap>
+
+
+
+	<insert id="insert" parameterType="AuditoriumVO">
+
+		INSERT INTO
+			tbl_audi ( aName, aSType, aVType, aTheme, aThemeSubInfo, floor, refTno)
+		VALUES
+			( #{aName}, #{aSType}, #{aVType}, #{aTheme}, #{aThemeSubInfo}, #{floor}, #{theater.tNo})
+
+	</insert>
+
+	<select id="selectByVO" resultMap="AudiResultMap" >
+
+		SELECT
+			*
+		FROM
+			tbl_audi AS audi 
+			LEFT JOIN 
+			 	tbl_theater AS theater 
+			ON 
+				audi.refTno = theater.tNo
+		<where> 
+    		<if test="aNo gt 0">
+        		AND audi.aNo = #{aNo}
+   	 		</if> 
+    		<if test="aName != null">
+        		AND audi.aName = #{aName}
+   	 		</if> 
+   	 		<if test="aSType != null">
+        		AND audi.aSType = #{aSType}
+   	 		</if>
+    		<if test="aVType != null">
+        		AND audi.aVType = #{aVType}
+   	 		</if>
+    		<if test="aTheme != null">
+        		AND audi.aTheme = #{aTheme}
+   	 		</if> 
+   	 		<if test="aThemeSubInfo != null">
+        		AND audi.aThemeSubInfo = #{aThemeSubInfo}
+   	 		</if>
+    		<if test="floor != null">
+        		AND audi.floor = #{floor}
+   	 		</if>
+    		<if test="theater != null">
+    			<if test="theater.tNo gt 0">
+        		AND audi.refTno = #{theater.tNo}
+        		</if>
+   	 		</if>
+  		</where>
+  		ORDER BY
+			audi.aNo DESC
+	</select>
+
+	<select id="selectByAno" resultMap="AudiResultMap" >
+
+		SELECT
+			*
+		FROM
+				tbl_audi AS audi 
+			LEFT JOIN 
+			 	tbl_theater AS theater 
+			ON 
+				audi.refTno = theater.tNo
+		WHERE        		
+        		audi.aNo = #{aNo}
+
+	</select>
+	
+	<select id="selectByTno" resultMap="AudiResultMap" >
+
+		SELECT
+			*
+		FROM
+				tbl_audi AS audi 
+			LEFT JOIN 
+			 	tbl_theater AS theater 
+			ON 
+				audi.refTno = theater.tNo
+		WHERE        		
+        		audi.refTno = #{tNo}
+
+	</select>
+
+
+	<delete id="delete">
+		
+		DELETE FROM 
+			tbl_audi 
+		WHERE 
+			aNo=#{aNo}
+			
+	</delete>
+
+
+	<update id="update" parameterType="AuditoriumVO">
+
+		UPDATE
+			tbl_audi
+		SET
+			aName=#{aName}, aSType=#{aSType}, aVType=#{aVType},	
+			aTheme=#{aTheme}, aThemeSubInfo=#{aThemeSubInfo}, 
+			floor=#{floor},	refTno=#{theater.tNo}
+		WHERE
+			aNo=#{aNo}
+			
+	</update>
+
+
+	
+	<select id="selectAll" resultMap="AudiResultMap">
+
+		SELECT
+			audi.*, theater.tNo, theater.tName
+		FROM
+				tbl_audi AS audi 
+			LEFT JOIN 
+			 	tbl_theater AS theater 
+			ON 
+				audi.refTno = theater.tNo
+		<include refid="searchOne" />
+		ORDER BY
+			audi.aNo DESC
+		LIMIT
+			#{pageStart}, #{perPageNum}
+
+	</select>
+
+
+	<select id="countPaging" resultType="int">
+
+		SELECT
+			count(audi.aNo)
+		FROM
+				tbl_audi AS audi 
+			LEFT JOIN 
+			 	tbl_theater AS theater 
+			ON 
+				audi.refTno = theater.tNo
+		<include refid="searchOne" />
+		ORDER BY
+			audi.aNo DESC
+
+	</select>
+
+
+	<sql id="searchOne">
+		<where>
+			<if test="keyword != null">
+
+				audi.aName like concat('%',#{keyword},'%')
+				or
+				audi.aSType like concat('%',#{keyword},'%')
+				or
+				audi.aVType like concat('%',#{keyword},'%')
+				or
+				audi.aTheme like concat('%',#{keyword},'%')
+				or
+				audi.aThemeSubInfo like concat('%',#{keyword},'%')
+				or
+				audi.floor like concat('%',#{keyword},'%')
+				or
+				theater.tName like concat('%',#{keyword},'%')
+
+			</if>
+		</where>
+	</sql>
+</mapper>
+
+
+
+
+
+
+
+

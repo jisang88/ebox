@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.ebox.mapper.TheaterMapper">
+
+	<resultMap type="TheaterVO" id="TheaterResultMap">
+		<id property="tNo" column="tNo" />
+		<result property="tName" column="tName" />
+		<result property="tAddrNum" column="tAddrNum" />
+		<result property="tAddrSt" column="tAddrSt" />
+		<result property="tManager" column="tManager" />
+		<result property="tTel" column="tTel" />
+	</resultMap>
+
+
+	<insert id="insert">
+
+		INSERT INTO
+			tbl_theater (tName, tAddrNum, tAddrSt, tManager, tTel)
+		VALUES
+			(#{tName}, #{tAddrNum}, #{tAddrSt}, #{tManager}, #{tTel})
+
+	</insert>
+
+	<select id="select" resultType="TheaterVO">
+
+		SELECT
+			*
+		FROM
+			tbl_theater
+		ORDER BY
+			tNo DESC
+
+	</select>
+	
+	<select id="selectByVO" resultType="TheaterVO" >
+
+		SELECT
+			*
+		FROM
+			tbl_theater
+		<where> 
+    		<if test="tNo gt 0">
+        		AND tNo = #{tNo}
+   	 		</if> 
+    		<if test="tName != null">
+        		AND tName = #{tName}
+   	 		</if> 
+   	 		<if test="tAddrNum != null">
+        		AND tAddrNum = #{tAddrNum}
+   	 		</if>
+    		<if test="tAddrSt != null">
+        		AND tAddrSt = #{tAddrSt}
+   	 		</if>
+    		<if test="tManager != null">
+        		AND tManager = #{tManager}
+   	 		</if>
+    		<if test="tTel != null">
+        		AND tTel = #{tTel}
+   	 		</if>
+  		</where>
+        	 
+	</select>
+	
+	<select id="selectByTno" resultType="TheaterVO" >
+
+		SELECT
+			*
+		FROM
+			tbl_theater
+		WHERE	
+        	tNo = #{tNo}
+        	 
+	</select>
+	
+	<select id="searchTnameByKeyWord" resultType="TheaterVO">
+
+		SELECT
+			*
+		FROM
+			tbl_theater
+		WHERE
+			tName like concat('%',#{keyword},'%')
+		ORDER BY
+			tNo DESC
+		LIMIT
+			#{pageStart}, #{perPageNum}
+
+	</select>
+	
+	<select id="countPagingByLikeTname" resultType="int">
+
+		SELECT
+			count(tNo)
+		FROM
+			tbl_theater
+		WHERE
+			tName like concat('%',#{keyword},'%')
+		ORDER BY
+			tNo DESC
+
+	</select>
+	
+	<select id="selectByTname" resultType="TheaterVO">
+
+		SELECT
+			*
+		FROM
+			tbl_theater
+		WHERE
+			tName = #{tName}
+
+	</select>
+
+	<delete id="delete">
+		DELETE FROM tbl_theater WHERE tNo=#{tNo}
+	</delete>
+
+
+	<update id="update">
+		UPDATE
+			tbl_theater
+		SET
+			tName=#{tName}, tAddrNum=#{tAddrNum}, tAddrSt=#{tAddrSt}, tManager=#{tManager}, tTel=#{tTel}
+		WHERE
+			tNo=#{tNo}
+	</update>
+
+
+	<select id="getTheaterWithAudiCnt" resultType="java.util.HashMap">
+
+		SELECT 
+			t.tname, t.tno, count(*) AS audiCnt 
+		FROM 
+			tbl_audi AS a, tbl_theater AS t WHERE a.ref_tno=t.tno
+		<include refid="searchOne" />
+		GROUP BY 
+			t.tname
+		ORDER BY
+			t.tno DESC 
+
+	</select>
+	
+
+	<select id="selectAllWithoutCri" resultType="TheaterVO">
+
+		SELECT
+			*
+		FROM
+			tbl_theater
+
+	</select>
+
+	<select id="selectByRegion" resultType="TheaterVO">
+	
+		SELECT
+			*
+		FROM
+			tbl_theater
+		Where
+			taddr_num LIKE CONCAT('%',#{region1},'%')
+			<if test="region2 != null">
+			or
+			taddr_str LIKE CONCAT('%',#{region2},'%')
+			</if>
+			<if test="region3 != null">
+			or
+			taddr_str LIKE CONCAT('%',#{region3},'%')
+			</if>
+		ORDER BY
+			tno DESC
+	</select>
+
+	<select id="selectAll" resultType="TheaterVO">
+
+		SELECT
+			*
+		FROM
+			tbl_theater
+		<include refid="searchOne" />
+		ORDER BY
+			tNo DESC
+		LIMIT
+			#{pageStart}, #{perPageNum}
+
+	</select>
+
+	
+
+
+	<select id="countPaging" resultType="int">
+
+		SELECT
+			count(tNo)
+		FROM
+			tbl_theater
+		<include refid="searchOne" />
+		ORDER BY
+			tNo DESC
+
+	</select>
+
+
+	<sql id="searchOne">
+		<where>
+			<!-- <if test="keyword != null">
+
+				tName like concat('%',#{keyword},'%')
+				or
+				tAddrNum like concat('%',#{keyword},'%')
+				or
+				tAddrSt like concat('%',#{keyword},'%')
+				or
+				tManager like concat('%',#{keyword},'%')
+				or
+				tTel like concat('%',#{keyword},'%')
+
+			</if> -->
+			
+			<if test="searchType=='n'.toString()">
+				tName like concat('%',#{keyword},'%')
+			</if>
+			<if test="searchType=='a'.toString()">
+				tAddrNum like concat('%',#{keyword},'%')
+				or
+				tAddrSt like concat('%',#{keyword},'%')
+			</if>
+			<if test="searchType=='m'.toString()">
+				tManager like concat('%',#{keyword},'%')
+			</if>
+		</where>
+	</sql>
+
+	<sql id="searchTwo">
+		<where>
+			<if test="keyword != null">
+				match(tname, taddr_num, taddr_str, tmanager, ttel) against(#{keyword})
+			</if>
+		</where>
+	</sql>
+
+</mapper>
+
+
+
+
+
+
+
+
+
+

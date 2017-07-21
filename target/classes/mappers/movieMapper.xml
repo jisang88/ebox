@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.ebox.mapper.MovieMapper">
+
+	
+	<resultMap type="MovieVO" id="MovieResultMap">
+		<id property="mNo" column="mNo" />
+		<result property="mNm" column="mNm" />
+		<result property="mNmEn" column="mNmEn" />
+		<result property="mShowTm" column="mShowTm" />
+		<result property="mActors" column="mActors" />
+		<result property="mDirector" column="mDirector" />
+		<result property="mOpenDt" column="mOpenDt" />
+		<result property="mWatchGradeNm" column="mWatchGradeNm" />
+		<result property="mNationNm" column="mNationNm" />
+		<result property="mGenreNm" column="mGenreNm" />
+		<result property="mStory" column="mStory" />
+	</resultMap>
+	
+	<insert id="insert" >
+
+		INSERT INTO
+			tbl_movie (
+			 	mNm, mNmEn, mShowTm, mActors,
+				mDirector, mOpenDt, mWatchGradeNm, 
+				mNationNm, mGenreNm, mStory
+				)
+		VALUES
+			( #{mNm}, #{mNmEn}, #{mShowTm}, #{mActors},
+			#{mDirector}, #{mOpenDt}, #{mWatchGradeNm}, 
+			#{mNationNm}, #{mGenreNm}, #{mStory})
+
+	</insert>
+
+	<delete id="delete">
+		
+		DELETE FROM 
+			tbl_movie 
+		WHERE 
+			mNo=#{mNo}
+			
+	</delete>
+
+
+	<update id="update" >
+	
+		UPDATE
+			tbl_movie
+		SET
+			mNm=#{mNm}, mNmEn=#{mNmEn}, 
+			mShowTm=#{mShowTm},	mActors=#{mActors},	
+			mDirector=#{mDirector},	mOpenDt=#{mOpenDt},	
+			mWatchGradeNm=#{mWatchGradeNm}, mNationNm=#{mNationNm}, 
+			mGenreNm=#{mGenreNm}, mStory=#{mStory}	
+		WHERE
+			mNo=#{mNo}
+			
+	</update>
+
+	<select id="selectLastRow" resultType="MovieVO">
+	
+		SELECT * FROM tbl_movie ORDER BY mNo DESC LIMIT 1;
+	
+	</select>
+	
+	<select id="selectById" resultType="MovieVO">
+	
+		SELECT 
+			* 
+		FROM 
+			tbl_movie 
+		WHERE 
+			mNo=#{mNo};
+			
+	</select>
+	
+	<select id="selectAll" resultType="MovieVO">
+
+		SELECT
+			*
+		FROM
+			tbl_movie 
+		ORDER BY
+			mNo DESC
+	</select>
+	
+	<select id="selectAllWithQuery" resultType="MovieVO" >
+
+		SELECT
+			*
+		FROM
+			tbl_movie 
+		<include refid="searchOne" />
+		ORDER BY
+			mNo DESC
+
+	</select>
+	
+	<select id="selectAllByName" resultType="MovieVO" >
+
+		SELECT
+			*
+		FROM
+			tbl_movie 
+		<include refid="searchTwo" />
+		ORDER BY
+			mNo DESC
+		LIMIT
+			#{pageStart}, #{perPageNum}
+
+	</select>
+	
+	<select id="selectAllWithCri" resultType="MovieVO">
+
+		SELECT
+			*
+		FROM
+			tbl_movie 
+		<include refid="searchOne" />
+		ORDER BY
+			mNo DESC
+		LIMIT
+			#{pageStart},#{perPageNum}
+
+	</select>
+
+
+	<select id="countPaging" resultType="int">
+
+		SELECT
+			count(mNo)
+		FROM
+				tbl_movie   
+		<include refid="searchOne" />
+		ORDER BY
+			mNo DESC
+
+	</select>
+	
+	<select id="countPagingByName" resultType="int">
+
+		SELECT
+			count(mNo)
+		FROM
+				tbl_movie   
+		<include refid="searchTwo" />
+		ORDER BY
+			mNo DESC
+
+	</select>
+
+
+	<sql id="searchOne">
+		<where>
+			<if test="keyword != null">
+
+				mNm like concat('%',#{keyword},'%')
+				or
+				mNmEn like concat('%',#{keyword},'%')
+				or
+				mActors like concat('%',#{keyword},'%')
+				or
+				mDirector like concat('%',#{keyword},'%')
+				or
+				mWatchGradeNm like concat('%',#{keyword},'%')
+				or
+				mNationNm like concat('%',#{keyword},'%')
+				or
+				mGenreNm like concat('%',#{keyword},'%')
+
+			</if>
+		</where>
+	</sql>
+	
+	<sql id="searchTwo">
+		<where>
+			<if test="keyword != null">
+
+				mNm like concat('%',#{keyword},'%')
+				or
+				mNmEn like concat('%',#{keyword},'%')
+				or
+				mDirector like concat('%',#{keyword},'%')
+
+			</if>
+		</where>
+	</sql>
+
+</mapper>
+
+
+
+
+
+
+
+
+
+

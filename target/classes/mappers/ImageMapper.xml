@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.ebox.mapper.ImageMapper">
+
+<!-- 	   
+	
+	iNo      INT         NOT NULL,  홍보물 번호
+	iPath    TEXT        NULL,      경로
+	iRegdate DATETIME    NULL,      등록날짜
+	iType    VARCHAR(20) NULL,      홍보물 형태
+	refMno   INT         NULL       영화번호
+
+-->
+
+	<insert id="insert" >
+
+		INSERT INTO
+			tbl_movie_pm ( iPath, iType, iRegdate, refMno	)
+		VALUES
+			( #{iPath}, #{iType}, NOW(), #{refMno})
+
+	</insert>
+
+	<delete id="delete">
+		
+		DELETE FROM 
+			tbl_movie_pm 
+		WHERE 
+			iNo=#{iNo}
+			
+	</delete>
+	
+	<delete id="deleteByMno">
+		
+		DELETE FROM 
+			tbl_movie_pm 
+		WHERE 
+			refMno=#{refMno}
+			
+	</delete>
+
+	<select id="selectAll" resultType="ImageVO">
+
+		SELECT
+			*
+		FROM
+			tbl_movie_pm 
+		WHERE 
+			refMno=#{mNo} 
+		ORDER BY
+			iNo DESC
+		
+	</select>
+	
+	<select id="selectWithMnoAndType" resultType="ImageVO">
+
+		SELECT
+			*
+		FROM
+			tbl_movie_pm 
+		WHERE 
+			refMno=#{mNo} AND iType=#{iType}
+		ORDER BY
+			iNo DESC
+		
+	</select>
+	
+	<select id="selectById" resultType="ImageVO">
+
+		SELECT
+			*
+		FROM
+			tbl_movie_pm 
+		WHERE 
+			iNo=#{iNo}
+		
+	</select>
+
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
