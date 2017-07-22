@@ -321,14 +321,12 @@ var ebox = {
 	},
 
 	setImagePreview : function($target, file) {
-
 		var reader = new FileReader();
-		reader.readAsDataURL(file);
 
+		reader.readAsDataURL(file);
 		reader.onload = function(e) {
 			$target.attr('src', e.target.result);
 		}
-
 		return $target;
 	}
 

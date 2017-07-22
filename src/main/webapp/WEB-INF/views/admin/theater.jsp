@@ -299,7 +299,7 @@
 							<span class="title">지점 등록</span>
 							<!-- -->
 							<i class="fa fa-plus" aria-hidden="true"></i>
-							<button class="btn bg-primary text-inverse pull-right waves-effect waves-light" id="btn-close-add-panel-1">
+							<button class="btn btn-primary text-bold pull-right waves-effect waves-light" id="btn-close-add-panel-1">
 								닫기 <i class="fa fa-times" aria-hidden="true"></i>
 							</button>
 						</div>
@@ -313,8 +313,8 @@
 									<div class="text-right col-xs-12">
 										<div class="form-btn-group">
 
-											<button type="button" class="btn bg-inverse text-inverse waves-effect waves-light" id="btn-submit-form-1">저장</button>
-											<button type="reset" class="btn btn-default waves-effect" id="btn-reset-form-1">입력취소</button>
+											<button type="button" class="btn btn-inverse text-bold waves-effect waves-light" id="btn-submit-form-1">저장</button>
+											<button type="reset" class="btn btn-default text-bold waves-effect" id="btn-reset-form-1">입력취소</button>
 										</div>
 									</div>
 								</div>
@@ -415,7 +415,7 @@
 							</div>
 
 
-							<button type="button" class="btn bg-primary text-inverse pull-right waves-effect waves-light" id="btn-open-add-panel-1">
+							<button type="button" class="btn btn-primary text-bold pull-right waves-effect waves-light" id="btn-open-add-panel-1">
 								지점 추가 <i class="fa fa-plus" aria-hidden="true"></i>
 							</button>
 
@@ -469,8 +469,8 @@
 											<td class="tbody-col-7"><a href="#"> 2위</a></td>
 
 											<td class="tbody-col-8">
-												<button class="btn bg-danger text-inverse btn-xs btn-update-in-row" data-pk="${theater.tNo}">수정</button>
-												<button class="btn bg-fail text-inverse btn-xs btn-delete-in-row" data-pk="${theater.tNo}" ondblclick="return false;">삭제</button>
+												<button class="btn btn-warning btn-xs waves-effect waves-light btn-update-in-row" data-pk="${theater.tNo}">수정</button>
+												<button class="btn btn-danger btn-xs waves-effect waves-light btn-delete-in-row" data-pk="${theater.tNo}" ondblclick="return false;">삭제</button>
 											</td>
 										</tr>
 									</c:forEach>

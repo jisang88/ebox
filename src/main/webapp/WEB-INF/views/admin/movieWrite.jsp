@@ -170,9 +170,6 @@
 						},
 						cache : true
 					},
-					escapeMarkup : function(markup) {
-						return markup;
-					}, // let our custom formatter work
 					templateResult : function(item) {
 						//console.log('templateResult\t', item)
 
@@ -296,15 +293,9 @@
 					event.preventDefault();
 
 					var form = $('#mForm1');
-					var temp = $('#file')[0].files;
-
-					console.log(temp)
-
 					var formData = new FormData(form[0]);
-					//var len = $('#file')[0].files.length;
 
 					var len = gnb_fileList.length;
-					console.log(len)
 
 					for (var i = 0; i < len; i++) {
 						var mFile = gnb_fileList[i];
@@ -328,8 +319,6 @@
 
 					}
 
-					console.log(formData)
-
 					$.ajax({
 						url : '${pageContext.request.contextPath }/admin/movie/write',
 						processData : false,
@@ -337,7 +326,6 @@
 						data : formData,
 						type : 'POST',
 						success : function(result) {
-							console.log("업로드 성공!!");
 							if (result === 'SUCCESS') {
 								self.location = '${pageContext.request.contextPath }/admin/movie/write';
 								alert('성공');
@@ -392,8 +380,7 @@
 
 							<div class="form-inline">
 								<div class="form-group">
-									<input type="file" class="form-control" id="file" name="fileList" multiple>
-									<input type="file" class="form-control" id="file2" name="file" style="display: none">
+									<input type="file" class="form-control" id="file" name="fileList" multiple> <input type="file" class="form-control" id="file2" name="file" style="display: none">
 								</div>
 							</div>
 							<div></div>
@@ -442,8 +429,7 @@
 
 						<div class="panel-body ">
 
-							<input type="hidden" name="mNo" id=mNo value="${empty movie.mNo?0:movie.mNo}">
-							<input type="hidden" name="movieCd" id="movieCd" value="0">
+							<input type="hidden" name="mNo" id=mNo value="${empty movie.mNo?0:movie.mNo}"> <input type="hidden" name="movieCd" id="movieCd" value="0">
 
 
 
@@ -478,9 +464,7 @@
 							</div> -->
 
 							<div class="form-group">
-								<label for="mNm">영화 검색</label>
-
-								<select class="js-data-example-ajax form-control">
+								<label for="mNm">영화 검색</label> <select class="js-data-example-ajax form-control">
 								</select>
 							</div>
 
@@ -491,25 +475,19 @@
 
 								<div class="col-md-4">
 									<div class="form-group">
-										<label for="mNm">Title (kor)</label>
-										<span class="help-txt help-inline pull-right"></span>
-										<input type="text" name="mNm" id="mNm" class="form-control" value="${movie.mNm }">
+										<label for="mNm">Title (kor)</label> <span class="help-txt help-inline pull-right"></span> <input type="text" name="mNm" id="mNm" class="form-control" value="${movie.mNm }">
 									</div>
 								</div>
 
 								<div class="col-md-4">
 									<div class="form-group">
-										<label for="mNmEn">Title (Eng)</label>
-										<span class="help-txt help-inline pull-right"></span>
-										<input type="text" name="mNmEn" id="mNmEn" class="form-control" value="${movie.mNmEn }">
+										<label for="mNmEn">Title (Eng)</label> <span class="help-txt help-inline pull-right"></span> <input type="text" name="mNmEn" id="mNmEn" class="form-control" value="${movie.mNmEn }">
 									</div>
 								</div>
 
 								<div class="col-md-4">
 									<div class="form-group">
-										<label>감독</label>
-										<span class="help-txt help-inline pull-right"></span>
-										<input type="text" name="mDirector" id="mDirector" class="form-control" value="${movie.mdirector }">
+										<label>감독</label> <span class="help-txt help-inline pull-right"></span> <input type="text" name="mDirector" id="mDirector" class="form-control" value="${movie.mdirector }">
 									</div>
 								</div>
 
@@ -519,9 +497,7 @@
 
 
 							<div class="form-group">
-								<label>배우</label>
-								<span class="help-txt help-inline pull-right"></span>
-								<input type="text" name="mActors" id="mActors" class="form-control" value="${movie.mactors }">
+								<label>배우</label> <span class="help-txt help-inline pull-right"></span> <input type="text" name="mActors" id="mActors" class="form-control" value="${movie.mactors }">
 							</div>
 
 
@@ -531,8 +507,7 @@
 
 								<div class="col-md-4">
 									<div class="form-group">
-										<label>개봉년도</label>
-										<span class="help-txt help-inline pull-right"></span>
+										<label>개봉년도</label> <span class="help-txt help-inline pull-right"></span>
 										<%-- 										<input type="text" name="mOpenDt" id="mOpenDt" class="form-control" value="${movie.mOpenDt }" data-date-format="Ymd"> --%>
 										<input type="text" name="mOpenDt" id="mOpenDt" class="form-control" value="${movie.mOpenDt }">
 									</div>
@@ -540,17 +515,13 @@
 
 								<div class="col-md-4">
 									<div class="form-group">
-										<label>영화 시간</label>
-										<span class="help-txt help-inline pull-right"></span>
-										<input type="text" name="mShowTm" id="mShowTm" class="form-control" value="${movie.mshowTm }">
+										<label>영화 시간</label> <span class="help-txt help-inline pull-right"></span> <input type="text" name="mShowTm" id="mShowTm" class="form-control" value="${movie.mshowTm }">
 									</div>
 								</div>
 
 								<div class="col-md-4">
 									<div class="form-group">
-										<label>관람등급</label>
-										<span class="help-txt help-inline pull-right"></span>
-										<input type="text" name="mWatchGradeNm" id="mWatchGradeNm" class="form-control" value="${movie.watchGradeNm }">
+										<label>관람등급</label> <span class="help-txt help-inline pull-right"></span> <input type="text" name="mWatchGradeNm" id="mWatchGradeNm" class="form-control" value="${movie.watchGradeNm }">
 									</div>
 								</div>
 
@@ -562,25 +533,20 @@
 
 								<div class="col-md-6">
 									<div class="form-group">
-										<label>제작 국가</label>
-										<span class="help-txt help-inline pull-right"></span>
-										<input type="text" name="mNationNm" id="mNationNm" class="form-control" value="${movie.mnationNm }">
+										<label>제작 국가</label> <span class="help-txt help-inline pull-right"></span> <input type="text" name="mNationNm" id="mNationNm" class="form-control" value="${movie.mnationNm }">
 									</div>
 								</div>
 
 								<div class="col-md-6">
 									<div class="form-group">
-										<label>장르</label>
-										<span class="help-txt help-inline pull-right"></span>
-										<input type="text" name="mGenreNm" id="mGenreNm" class="form-control" value="${movie.genreNm }">
+										<label>장르</label> <span class="help-txt help-inline pull-right"></span> <input type="text" name="mGenreNm" id="mGenreNm" class="form-control" value="${movie.genreNm }">
 									</div>
 								</div>
 
 							</div>
 
 							<div class="form-group">
-								<label>줄거리</label>
-								<span class="help-txt help-inline pull-right"></span>
+								<label>줄거리</label> <span class="help-txt help-inline pull-right"></span>
 								<textarea rows="15" name="mStory" id="mStory" class="form-control" style="width: 100%; padding: 30px;" wrap="hard">
 								${movie.content }
 								</textarea>

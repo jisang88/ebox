@@ -107,6 +107,57 @@ public class AdminMovieController {
 		return "/admin/movie/write";
 	}
 
+
+
+	@Transactional
+	@ResponseBody
+	@RequestMapping(value = "/write", method = RequestMethod.POST)
+	public ResponseEntity<String> writePOST2(List<MultipartFile> imglist, MovieVO movie) {
+
+		System.out.println("\n\n");
+		logger.info("AdminMovieController -> writePOST2....");
+
+		System.out.println("\n");
+		System.out.println("MovieVO\t" + movie);
+
+		System.out.println("\n\n");
+		for (MultipartFile multipartFile : imglist) {
+			System.out.println(multipartFile.getName());// 해당 파일을 가지고 있는 변수 이름
+			System.out.println(multipartFile.getOriginalFilename()); // 파일 이름
+			System.out.println(multipartFile.getSize()); // 파일 사이즈
+			System.out.println(multipartFile.getContentType()); // 파일 타입
+			System.out.println("\n\n");
+		}
+
+		ResponseEntity<String> entity = null;
+
+		try {
+
+			entity = new ResponseEntity<>("SUCCESS", HttpStatus.OK);// 200
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			entity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);// 404
+		}
+		System.out.println("\n\n");
+		return entity;
+	}
+
+	/*
+	 * @Transactional
+	 * 
+	 * @RequestMapping(value = "/write", method = RequestMethod.POST) public
+	 * String movieWritePOST(List<MultipartFile> imgList, MovieVO movie) {
+	 * 
+	 * System.out.println("\n\n"); logger.info(
+	 * "AdminMovieController -> writePOST2....");
+	 * 
+	 * System.out.println("\n"); System.out.println("MovieVO\t" + movie);
+	 * System.out.println("imgList\t" + imgList.size());
+	 * 
+	 * System.out.println("\n\n"); return "redirect:/admin/movie/list"; }
+	 */
+
 	/*
 	 * @ResponseBody
 	 * 
@@ -285,77 +336,58 @@ public class AdminMovieController {
 
 
 
-	@Transactional
-	@ResponseBody
-	@RequestMapping(value = "/write", method = RequestMethod.POST)
-	public ResponseEntity<String> writePOST2(List<MultipartFile> posterList, List<MultipartFile> hPosterList, List<MultipartFile> stillCutList, List<MultipartFile> eventList,
-			List<MultipartFile> videoList, MovieVO movie) {
-
-		System.out.println("\n\n");
-		logger.info("AdminMovieController -> writePOST2....");
-
-		System.out.println("\n");
-		System.out.println("MovieVO\t" + movie);
-
-		ResponseEntity<String> entity = null;
-
-		try {
-			movieService.write(movie);
-			MovieVO vo = movieService.getLastRow();
-			if (isValid(posterList)) {
-				System.out.println("poster OK");
-				imageService.write(posterList, ImageVO.TYPE_POSTER, vo);
-
-			} else {
-				System.out.println("poster fail");
-			}
-
-			System.out.println("\n\n");
-			if (isValid(hPosterList)) {
-				System.out.println("poster OK");
-				imageService.write(hPosterList, ImageVO.TYPE_H_POSTER, vo);
-
-			} else {
-				System.out.println("poster fail");
-			}
-
-			System.out.println("\n\n");
-			if (isValid(stillCutList)) {
-				System.out.println("poster OK");
-				imageService.write(stillCutList, ImageVO.TYPE_STILLCUT, vo);
-
-			} else {
-				System.out.println("poster fail");
-			}
-
-			System.out.println("\n\n");
-
-			if (isValid(eventList)) {
-				System.out.println("photo OK");
-				imageService.write(eventList, ImageVO.TYPE_EVENT, vo);
-			} else {
-				System.out.println("photo fail");
-			}
-			System.out.println("\n\n");
-
-			if (isValid(videoList)) {
-				System.out.println("video OK");
-				imageService.write(videoList, ImageVO.TYPE_VIDEO, vo);
-			} else {
-				System.out.println("video fail");
-			}
-
-			entity = new ResponseEntity<>("SUCCESS", HttpStatus.OK);// 200
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			entity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);// 404
-		}
-		System.out.println("\n\n");
-		return entity;
-	}
-
-
+	/*
+	 * @Transactional
+	 * 
+	 * @ResponseBody
+	 * 
+	 * @RequestMapping(value = "/write", method = RequestMethod.POST) public
+	 * ResponseEntity<String> writePOST2(List<MultipartFile> posterList,
+	 * List<MultipartFile> hPosterList, List<MultipartFile> stillCutList,
+	 * List<MultipartFile> eventList, List<MultipartFile> videoList, MovieVO
+	 * movie) {
+	 * 
+	 * System.out.println("\n\n"); logger.info(
+	 * "AdminMovieController -> writePOST2....");
+	 * 
+	 * System.out.println("\n"); System.out.println("MovieVO\t" + movie);
+	 * 
+	 * ResponseEntity<String> entity = null;
+	 * 
+	 * try { movieService.write(movie); MovieVO vo = movieService.getLastRow();
+	 * if (isValid(posterList)) { System.out.println("poster OK");
+	 * imageService.write(posterList, ImageVO.TYPE_POSTER, vo);
+	 * 
+	 * } else { System.out.println("poster fail"); }
+	 * 
+	 * System.out.println("\n\n"); if (isValid(hPosterList)) {
+	 * System.out.println("poster OK"); imageService.write(hPosterList,
+	 * ImageVO.TYPE_H_POSTER, vo);
+	 * 
+	 * } else { System.out.println("poster fail"); }
+	 * 
+	 * System.out.println("\n\n"); if (isValid(stillCutList)) {
+	 * System.out.println("poster OK"); imageService.write(stillCutList,
+	 * ImageVO.TYPE_STILLCUT, vo);
+	 * 
+	 * } else { System.out.println("poster fail"); }
+	 * 
+	 * System.out.println("\n\n");
+	 * 
+	 * if (isValid(eventList)) { System.out.println("photo OK");
+	 * imageService.write(eventList, ImageVO.TYPE_EVENT, vo); } else {
+	 * System.out.println("photo fail"); } System.out.println("\n\n");
+	 * 
+	 * if (isValid(videoList)) { System.out.println("video OK");
+	 * imageService.write(videoList, ImageVO.TYPE_VIDEO, vo); } else {
+	 * System.out.println("video fail"); }
+	 * 
+	 * entity = new ResponseEntity<>("SUCCESS", HttpStatus.OK);// 200
+	 * 
+	 * } catch (Exception e) { e.printStackTrace(); entity = new
+	 * ResponseEntity<>(HttpStatus.BAD_REQUEST);// 404 }
+	 * System.out.println("\n\n"); return entity; }
+	 */
 
 	@ResponseBody
 	@RequestMapping("/displayFile")

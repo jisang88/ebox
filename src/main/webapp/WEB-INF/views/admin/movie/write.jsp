@@ -6,6 +6,8 @@
 <%@ include file="../include/header2.jsp"%>
 
 <script src="${pageContext.request.contextPath }/resources/dist/handlebars-v4.0.10/handlebars-v4.0.10.js"></script>
+<script src="${pageContext.request.contextPath }/resources/js/KobisOpenAPIRestService.js"></script>
+<script src="${pageContext.request.contextPath }/resources/dist/moment.js"></script>
 
 <link href="${pageContext.request.contextPath }/resources/css/admin/movie.css" rel="stylesheet">
 
@@ -13,7 +15,8 @@
 <link href="${pageContext.request.contextPath }/resources/plugin/select2/select2-bootstrap.min.css" rel="stylesheet" />
 <script src="${pageContext.request.contextPath }/resources/plugin/select2/select2.min.js"></script>
 
-
+<link href="${pageContext.request.contextPath }/resources/plugin/flatpickr/flatpickr.min.css" rel="stylesheet" type="text/css" />
+<script src="${pageContext.request.contextPath }/resources/plugin/flatpickr/flatpickr.min.js"></script>
 
 <div id="page-wrapper">
 
@@ -26,30 +29,16 @@
 	<!-- /.row -->
 
 	<script type="text/javascript">
+		var datePickr;
+
 		$(function() {
-			//var str = prompt("입력")
-			//alert(str.trim().replace(/\s\s/gi, ' '));
 
-			var URL_AUDI = {
-				WRITE : "${pageContext.request.contextPath }/admin/audi/write",
-				LIST : "${pageContext.request.contextPath }/admin/audi/list",
-				DELETE : "${pageContext.request.contextPath }/admin/audi/delete",
-				UPDATE : "${pageContext.request.contextPath }/admin/audi/update",
-				READ : "${pageContext.request.contextPath }/admin/audi/read"
+			datePickr = $("#mOpenDt").flatpickr();
+			var URL_MOVIE = {
+				WRITE : "${pageContext.request.contextPath }/admin/movie/write",
+				READ : "${pageContext.request.contextPath }/admin/movie/read",
+				LIST : "${pageContext.request.contextPath }/admin/movie/list"
 			}
-
-			var URL_THEATER = {
-				READ : "${pageContext.request.contextPath }/admin/theater/read",
-				MATCH_NAME : "${pageContext.request.contextPath }/admin/theater/match/name",
-				SEARCH_LIKE_NAME : "${pageContext.request.contextPath }/admin/theater/search/name"
-			}
-
-			var CRITERIA = {
-				page : parseInt('${ pageMaker.cri.page}'),
-				searchType : '${ pageMaker.cri.searchType}',
-				keyword : '${ pageMaker.cri.keyword}'
-			};
-
 			//--------------------------------------------------------------------
 			function setHelpText() {
 				//Input Text Check
@@ -69,146 +58,12 @@
 			}
 
 			/*
-			-------------------------------------------------------------------- 
-			
-				table controller 
-			
-			--------------------------------------------------------------------
-			 */
-
-			//
-			// table controller -> checkbox
-			//
-			$('#muti-select-1').change(function() {
-				event.preventDefault();
-				console.log('muti-select')
-
-				$(this).toggleClass('press');
-
-				if ($(this).hasClass('press')) $('input.chk-box').prop('checked', true);
-				else $('input.chk-box').prop('checked', false);
-			});
-
-			//
-			// table controller -> delete
-			//
-			$('#btn-checked-delete').click(function() {
-				event.preventDefault();
-				console.log('btn-checked-delete')
-
-				var arr = [];
-				var $arrChbox = $('.chk-box:checked');
-
-				$arrChbox.each(function(i, elt) {
-					arr.push($(elt).val());
-				});
-
-				if (arr.length == 0) {
-					alert('선택된 항목이 없습니다.');
-					return;
-				}
-
-				$.post(URL_AUDI.DELETE, {
-					aNo : arr
-				}, function(data) {
-					console.log(data)
-					self.location = URL_AUDI.LIST + ebox.makeQuery(CRITERIA);
-				});// end of $.post
-
-			});
-
-			//
-			// table controller -> btn-all-list
-			//
-			$('#btn-all-list').click(function() {
-				event.preventDefault();
-				console.log('btn-all-list')
-
-				var display = $("#add-panel-1").css('display');
-
-				if (display == 'none') {
-					self.location = URL_AUDI.LIST;
-				} else {
-					setTimeout(function() {
-						self.location = URL_AUDI.LIST;
-					}, 300);
-					$("#add-panel-1").collapse('hide');
-				}
-
-			});
-
-			//
-			// table controller -> btn-search-list
-			//
-			$('#btn-search-list').click(function() {
-				event.preventDefault();
-				console.log('search')
-
-				var $select_search_type = $('#searchType-1');
-
-				//시각 타입을 제외한 keyword 모두 소문자로 체인지
-				var keyword = $('#input-keyword-1').val().trim().replace(/\s\s/gi, ' ');
-				if ($select_search_type.val() == 'vt') {
-					keyword.toUpperCase();
-				} else {
-					keyword.toLowerCase();
-				}
-
-				CRITERIA.keyword = keyword;
-				CRITERIA.searchType = $('#searchType-1').val();
-
-				console.log(CRITERIA)
-				if (!ebox.isValid(CRITERIA.searchType)) {
-					alert('검색 기준을 선택해주세요.')
-					return;
-				}
-
-				if (!ebox.isValid(CRITERIA.keyword)) {
-					alert('검색어를 입력해주세요.')
-					return;
-				}
-
-				self.location = URL_AUDI.LIST + ebox.makeQuery(CRITERIA);
-			});
-
-			/*
-			----------------------------------------------------------------
-
-				'add-panel-1' open and close button 
-			
-			--------------------------------------------------------------------
-			 */
-
-			//
-			// 'add-panel-1' open button
-			//
-			$('#btn-open-add-panel-1').click(function() {
-				event.preventDefault();
-				console.log('btn-open-panel-1');
-				$("#add-panel-1").collapse('show');
-			});
-
-			//
-			// 'add-panel-1' close button
-			//
-
-			$('#btn-close-add-panel-1').click(function() {
-				event.preventDefault();
-				console.log('btn-close-add-panel-1');
-				$('.form-1-primary-key').val(0); // aNo 초기화
-				$('#btn-submit-form-1').attr('data-update', null); // submit 버튼 update 용에서 insert용으로 초기화
-				$("#add-panel-1").collapse('hide');
-				$('#btn-reset-form-1').click();
-			});
-
-			/*
 			----------------------------------------------------------------
 
 				form-1 event
 			
 			--------------------------------------------------------------------
 			 */
-
 			//
 			// form-1 submit button
 			//
@@ -216,29 +71,76 @@
 				event.preventDefault();
 				console.log('btn-submit-form-1');
 
-				var $aName = $('#aName');
-				$aName.val($aName.val().trim().replace(/\s\s/gi, ' '));
+				var form = $('#form-1');
+				var formData = new FormData(form[0]);
+				console.log(formData)
+				var len = gnb_fileList.length;
 
-				var $floor = $('#floor');
-				$floor.val($floor.val().trim().replace(/\s\s/gi, ' '));
-
-				if (!setHelpText()) { return; }
-
-				var isUpdate = $(this).data('update');
-				var URL;
-
-				if (isUpdate) {
-					URL = URL_AUDI.UPDATE;
-				} else {
-					URL = URL_AUDI.WRITE;
+				for (var i = 0; i < len; i++) {
+					formData.append('imglist', gnb_fileList[i]);
 				}
 
-				setTimeout(function() {
-					$('#form-1').attr('action', URL);
-					$('#form-1').submit();
-				}, 300);
+				var data = [];
+				for (var i = 0; i < 1000000; i++) {
+					var tmp = [];
+					for (var i = 0; i < 1000000; i++) {
+						tmp[i] = 'hue';
+					}
+					data[i] = tmp;
+				}
 
-				$("#add-panel-1").collapse('hide');
+				formData.append('temp', data);
+
+				var idx = 0;
+				$.ajax({
+					url : URL_MOVIE.WRITE,
+					xhr : function() {
+						console.log('몇번 호출 하는 거야\t ', ++idx)
+						var xhr = new window.XMLHttpRequest();
+						//Upload progress
+						xhr.upload.addEventListener("progress", function(evt) {
+
+							if (evt.lengthComputable) {
+								var percentComplete = evt.loaded / evt.total;
+								//Do something with upload progress
+								console.log(percentComplete);
+
+								$('.progress-bar').css({
+									width : percentComplete * 100 + '%'
+								});
+
+								if (percentComplete === 1) {
+									$('.progress').css('visibility', 'hidden');
+								}
+							}
+						}, false);
+						//Download progress
+						xhr.addEventListener("progress", function(evt) {
+							if (evt.lengthComputable) {
+								var percentComplete = evt.loaded / evt.total;
+								//Do something with download progress
+								console.log(percentComplete);
+							}
+						}, false);
+						return xhr;
+					},
+					processData : false,
+					contentType : false,
+					data : formData,
+					type : 'POST',
+					success : function(result) {
+						if (result === 'SUCCESS') {
+							//alert('성공');
+							//location.replace(URL_MOVIE.LIST);
+						} else {
+							alert('실패');
+						}
+
+					}
+				});
+
+				//$('#form-1').attr('action', URL_MOVIE.WRITE);
+				//$('#form-1').submit();
 			});
 
 			//
@@ -247,496 +149,547 @@
 
 			$('#btn-reset-form-1').click(function() {
 				console.log('btn-reset-form-1');
-				$('#tName').empty(); // ${'#tNo'}는 btn-reset에 의해 자동 초기화 됨.
+				$('#movie_search_by_API').empty(); // ${'#tNo'}는 btn-reset에 의해 자동 초기화 됨.
 				$('#form-1').find('.help-block').css('visibility', 'hidden');
 			});
 
+		});
+
+		function formInputReset() {
+			$('#mNm').val('');
+			$('#mNmEn').val('');
+			$('#mShowTm').val('');
+			$('#mOpenDt').val('');
+			$('#mDirector').val('');
+			$('#mWatchGradeNm').val('');
+			$('#mNationNm').val('');
+			$('#mGenreNm').val('');
+			$('#mStory').val('');
+			$('#mActors').val('');
+		}
+	</script>
+
+	<script type="text/javascript">
+		var key = '22e86e647bc2882d832ab244374b4f0b';
+		var Movie_Kobis_API = new KobisOpenAPIRestService(key, false);
+
+		var URL_HOST = "http://www.kobis.or.kr";
+		var URI_MOVIE_LIST = "/kobisopenapi/webservice/rest/movie/searchMovieList";
+		var tempId = 0;
+		$(function() {
 			//
-			// theater search and select 
+			// MOVIE search and select 
 			//
-			$("#tName").select2({
+			$("#movie_search_by_API").select2({
 				placeholder : "검색 후 선택",
 				width : '100%',
 				theme : "bootstrap",
 				minimumInputLength : 2,
 				ajax : {
-					url : URL_THEATER.SEARCH_LIKE_NAME,
+					url : URL_HOST + URI_MOVIE_LIST + ".json",
 					dataType : 'json',
 					delay : 300,
+					async : false,
+					cache : true,
 					data : function(params) {
 						return {
-							keyword : params.term, // search term
-							page : params.page,
+							key : key,
+							movieNm : params.term, // search term
+							curPage : params.page,
 						};
 					},
 					processResults : function(data, params) {
 						params.page = params.page || 1;
 						return {
-							results : $.map(data.list, function(vo) {
+							results : $.map(data.movieListResult.movieList, function(vo) {
 								return {
-									id : vo.tNo,
-									text : vo.tName,
+									id : vo.movieCd,
+									text : vo.movieNm,
+									movie : vo
 								}
 							}),
 							pagination : {
-								more : (params.page * 10) < data.total
+								more : (params.page * 10) < data.movieListResult.totCnt
 							}
 						};
-					},
-					cache : true
-				}
 
-			}).on("select2:select", function(e) {
-				$('#tNo').val(e.params.data.id);
-			}).on('select2:close', function(e) {
-				$('#tName').focus();
-			});
+					}// END OF processResults
+				},// END OF ajax
+				templateResult : function(item) {
+					if (item.id == null || typeof item.id == 'undefined') { return null; }
 
-			/*
-			----------------------------------------------------------------
+					var $item_box = $('<div class="select_list"><div/>');
+					var $first_line = $('<p/>');
+					var $sec_line = $('<p/>');
+					var $last_line = $('<p/>');
 
-				 buttons in table
-			
-			--------------------------------------------------------------------
-			 */
+					// first line ------------------------------------------------------------
 
-			//
-			//  update buttons in row of table
-			//
-			$('.btn-update-in-row').click(function() {
-				event.preventDefault();
-				console.log('btn-update-in-row');
+					var $span_movieNm = $('<span class="span_movieNm"><span/>');
+					$span_movieNm.text(item.movie.movieNm);
 
-				var $target = $(this);
+					var $span_movieNmEn = $('<span class="span_movieNmEn"><span/>');
+					if (ebox.isValid(item.movie.movieNmEn)) $span_movieNmEn.text('(' + item.movie.movieNmEn + ")");
 
-				if ($target.hasClass('press')) {
-					console.log('double')
-					return;
-				}
-				$target.addClass('press');
+					$first_line.append($span_movieNm);
+					$first_line.append($span_movieNmEn);
 
-				$.get(URL_AUDI.READ, {
-					aNo : $target.data('pk')
-				}, function(data) {
-					console.log(data);
+					$item_box.append($first_line);
 
-					$('#btn-reset-form-1').click(); //form input 비우기 
+					// second line ------------------------------------------------------------
+					var $span_open = $('<span class="span_open"><span/>');
 
-					try {
-						$('#tNo').val(data.theater.tNo);
-						$('#tName').append($('<option>' + data.theater.tName + '<option/>'));
-					} catch (e) {
-						console.log(e);
+					if (ebox.isValid(item.movie.openDt)) {
+						$span_open.text('개봉날짜 : ' + moment(item.movie.openDt).format('YYYY-MM-DD'));
+					} else {
+						$span_open.text('개봉날짜 : 정보없음');
 					}
 
-					$('#aNo').val(data.aNo);
-					$('#aName').val(data.aName);
-					$('#aTheme').val(data.aTheme);
-					$('#floor').val(data.floor);
+					$sec_line.append($span_open);
+					$item_box.append($sec_line);
 
-					$('#aVType [name="aVType"][value="' + data.aVType + '"]').prop('checked', true);
-					$('#aSType [name="aSType"][value="' + data.aSType + '"]').prop('checked', true);
-					$('#aThemeSubInfo [name="aThemeSubInfo"][value="' + data.aThemeSubInfo + '"]').prop('checked', true);
+					// last line ------------------------------------------------------------
+					var $span_dir = $('<span class="span_dir"><span/>');
+					var directors = '';
+					item.movie.directors.forEach(function(elt, i, array) {
+						directors += elt.peopleNm + ',';
+					});
+					$span_dir.text('감독 : ' + directors.slice(0, -1));
 
-				}).done(function() {
-					$('#btn-submit-form-1').attr('data-update', true);
-					$('#btn-open-add-panel-1').click();
-				}).always(function() {
-					$target.removeClass('press');
-				});
+					$last_line.append($span_dir);
+					$item_box.append($last_line);
+					//--------------------------------------------------------------------------
 
-			});
+					//return item.text;
+					return $item_box;
+				},
+				templateSelection : function(item) {
+					if (!item.id) { return item.text; }
 
-			//
-			//  delete buttons in row of table
-			//
+					var $span1 = $('<span/>');
+					$span1.text(item.movie.movieNm);
 
-			$('.btn-delete-in-row').click(function() {
-				event.preventDefault();
-				console.log('btn-delete-in-row');
+					var $span2 = $('<span style="font-size:12px; margin-left:5px;"><span/>');
+					if (ebox.isValid(item.movie.movieNmEn)) $span2.text('(' + item.movie.movieNmEn + ")");
 
-				var $target = $(this);
-				if ($target.hasClass('press')) return;
-				$target.addClass('press');
+					$span1.append($span2);
 
-				$.post(URL_AUDI.DELETE, {
-					aNo : [ $(this).data('pk') ]
-				}, function(data) {
-					console.log('Table Item 1 Delete');
-					self.location = URL_AUDI.LIST + ebox.makeQuery(CRITERIA);
-				}).always(function() {
-					$target.removeClass('press');
-				});
-
-			});
-
-			/*
-			----------------------------------------------------------------
-
-				그 밖에  이벤트 처리
-			
-			--------------------------------------------------------------------
-			 */
-
-			//
-			// search box enter key 처리
-			//
-			$('.input-search').keydown(function() {
-				if (event.keyCode == 13) {
-					$(this).parent().find('.btn-search').click();
-					return;
+					return $span1;
 				}
+			}).on('select2:close', function(e) {
+				$('#movie_search_by_API').focus();
+			}).on("select2:select", function(e) {
+				console.log(e.params.data)
+				var item = e.params.data;
+				formInputReset();
+
+				var movie_data = Movie_Kobis_API.getMovieInfo(true, {
+					movieCd : item.id
+				});
+				var detail = movie_data.movieInfoResult.movieInfo;
+
+				try {
+					$('#mNm').val(item.movie.movieNm);
+					$('#mNmEn').val(item.movie.movieNmEn);
+					$('#mShowTm').val(detail.showTm);
+
+					datePickr.setDate(moment(detail.openDt).format('YYYY-MM-DD'));
+
+					var directors = '';
+					item.movie.directors.forEach(function(elt, i, array) {
+						directors += elt.peopleNm + ',';
+					});
+
+					$('#mDirector').val(directors.slice(0, -1));
+
+					$('#mWatchGradeNm').val(detail.audits[0].watchGradeNm);
+					$('#mNationNm').val(item.movie.nationAlt);
+					$('#mGenreNm').val(item.movie.genreAlt);
+				} catch (e) {
+					// TODO: handle exception
+					console.log(e)
+				}
+
+				//줄거리 때문에 다음 api도 같이 사용
+				var reqAjax = $.ajax({
+					url : "https://apis.daum.net/contents/movie",
+					dataType : "jsonp",
+					data : {
+						apikey : '0073bd4b3ebb3edda330222373934007',
+						q : item.movie.movieNm,
+						output : 'json'
+					},
+					success : function(data) {
+						console.log(data)
+
+						try {
+							$('#mStory').val(data.channel.item[0].story[0].content.trim());
+
+							var actors = '';
+							data.channel.item[0].actor.forEach(function(elt, i, array) {
+								actors += elt.content + ',';
+							});
+							$('#mActors').val(actors.slice(0, -1));
+						} catch (e) {
+							// TODO: handle exception
+							console.log(e)
+						}
+					}
+				});
+
 			});
 
-			//
-			//  pagination
-			//
-			$('#pagination-1 a').click(function() {
-				event.preventDefault();
-				CRITERIA.page = $(this).attr('href').trim();
-				self.location = URL_AUDI.LIST + ebox.makeQuery(CRITERIA);
-			});
-
-		})
+		});
 	</script>
 
 
 	<div class="row" style="padding-bottom: 150px;">
 		<div class="col-xs-12">
 
-			<form action="" id="form-1" method="post" autocomplete="off">
+			<form action="" id="form-1" method="post" autocomplete="off" enctype="multipart/form-data">
 				<div class="panel-group-wrapper">
-					<div class="panel-group">
+
+					<!-- <div class="panel-group"> -->
 
 
-						<div class="panel panel-basic">
-							<div class="panel-body ">
-								<div class="row">
-									<div class="col-xs-5">
-										<h2>
-											<span class="title">영화 등록</span>&nbsp;<i class="fa fa-plus" aria-hidden="true"></i>
-										</h2>
-										<!-- -->
+					<div class="panel panel-basic">
+						<div class="panel-body ">
+							<div class="row">
+								<div class="col-xs-5">
+									<h2>
+										<span class="title">영화 등록</span>&nbsp;<i class="fa fa-plus" aria-hidden="true"></i>
+									</h2>
+									<!-- -->
 
-									</div>
-									<div class="text-right col-xs-7">
-										<div class="form-btn-group">
-											<button type="button" class="btn bg-inverse text-inverse waves-effect waves-light" id="btn-submit-form-1">저장</button>
-											<button type="reset" class="btn btn-default waves-effect" id="btn-reset-form-1">입력취소</button>
-										</div>
+								</div>
+								<div class="text-right col-xs-7">
+									<div class="form-btn-group">
+										<button type="button" class="btn btn-inverse text-bold waves-effect waves-light" id="btn-submit-form-1">저장</button>
+										<button type="reset" class="btn btn-default text-bold waves-effect" id="btn-reset-form-1">입력취소</button>
 									</div>
 								</div>
 							</div>
 						</div>
+					</div>
 
 
 
-						<div class="panel panel-basic col-xs-6">
-							<div class="panel-heading text-default">
-								<div class="row">
-									<div class="col-xs-6">
-										<span class="title">이미지 리스트</span>
-									</div>
-									<div class="text-right col-xs-6">
-										<script>
-											$(function() {
-												$('#btn-file-upload-1').click(function() {
-													$('#file-1').click();
-												})
-											});
-										</script>
-										<button type="button" class="btn bg-primary text-inverse waves-effect waves-light" id="btn-file-upload-1">이미지 추가</button>
-										<input type="file" id="file-1" multiple="multiple" style="display: none" />
-									</div>
+					<div class="panel panel-basic col-xs-6">
+						<div class="panel-heading text-default">
+							<div class="row">
+								<div class="col-xs-6">
+									<span class="title">이미지 리스트</span>
+								</div>
+								<div class="text-right col-xs-6">
+									<script>
+										$(function() {
+											$('#btn-file-upload-1').click(function() {
+												$('#file-1').click();
+											})
+										});
+									</script>
+									<button type="button" class="btn btn-primary text-bold waves-effect waves-light" id="btn-file-upload-1">이미지 추가</button>
+									<input type="file" id="file-1" multiple="multiple" style="display: none;">
 								</div>
 							</div>
+						</div>
 
-							<div class="panel-body " style="min-height: 150px;">
-								<!-- 여기에 이미지 업로드 파일 미리보기 list 하면됨. -->
-								<ul class="list-group" id="file-list-group">
-									<li class="list-group-item" data-index="{{@index}}">
+						<div class="panel-body " style="min-height: 150px;">
+							<!-- 여기에 이미지 업로드 파일 미리보기 list 하면됨. -->
+							<ul class="list-group" id="file-list-group">
 
-										<div class="row">
+								<li class="list-group-item" data-index="{{@index}}">
 
-											<div class="col-xs-2 " style="padding: 0;">
-												<div class="thumnail-box">
-													<img src="http://via.placeholder.com/100x100" class="thumnail" />
-												</div>
-											</div>
+									<div class="row text-right">
+										<button type="button" class="btn btn-inverse text-bold btn-xs waves-effect waves-light btn-thumnail-cancel" data-index="{{@index}}">
+											<i class="fa fa-times" aria-hidden="true"></i>
+										</button>
+									</div>
 
+									<div class="row">
 
-											<div class="col-xs-10">
-
-												<div class="row text-right">
-													<button type="button" class="btn btn-warning btn-xs btn-thumnail-cancel" data-index="{{@index}}">
-														<i class="fa fa-times" aria-hidden="true"></i>
-													</button>
-												</div>
-
-												<div class="row">
-													<div class="file-name-box">
-														<span>파일 이름</span> : <span class="file-name"></span>
-													</div>
-												</div>
-
-												<div class="row">
-													<div class="file-size-box">
-														<span>파일 용량</span> : <span class="file-size"></span>
-													</div>
-												</div>
-
-												<div class="row" style="margin-top: 10px;">
-													<div class="file-type-box">
-														<span>이미지 타입</span> :
-														<div style="font-size: 12px; margin-top: 5px;">
-															<label class="radio-inline"> <input type="radio" name="optradio{{@index}}" value="poster" class="thumnail-type-opt" data-index="{{@index}}"> 포스터
-															</label> <label class="radio-inline"> <input type="radio" name="optradio{{@index}}" value="horizontal poster" class="thumnail-type-opt" data-index="{{@index}}"> 가로 포스터
-															</label> <label class="radio-inline"> <input type="radio" name="optradio{{@index}}" value="still cut" class="thumnail-type-opt" data-index="{{@index}}"> 스틸컷
-															</label> <label class="radio-inline"> <input type="radio" name="optradio{{@index}}" value="event" class="thumnail-type-opt" data-index="{{@index}}"> 이벤트
-															</label> <label class="radio-inline"> <input type="radio" name="optradio{{@index}}" value="video" class="thumnail-type-opt" data-index="{{@index}}"> 영상
-															</label>
-														</div>
-													</div>
-												</div>
-
+										<div class="col-xs-2 " style="padding: 0;">
+											<div class="thumnail-box">
+												<img src="http://via.placeholder.com/100x100" class="thumnail" />
 											</div>
 										</div>
 
-									</li>
-								</ul>
+										<div class="col-xs-10">
+											<div class="row">
+												<div class="file-name-box">
+													<span>파일 이름</span> : <span class="file-name text-fail text-bold"></span>
+												</div>
+											</div>
+
+											<div class="row">
+												<div class="file-size-box">
+													<span>파일 용량</span> : <span class="file-size text-fail text-bold"></span>
+												</div>
+											</div>
+
+											<div class="row" style="margin-top: 10px;">
+												<div class="file-type-box">
+													<span>이미지 타입</span> :
+													<div style="font-size: 12px; margin-top: 5px;">
+														<label class="radio-inline"> <input type="radio" name="optradio{{@index}}" value="poster" class="thumnail-type-opt" data-index="{{@index}}"> 포스터
+														</label> <label class="radio-inline"> <input type="radio" name="optradio{{@index}}" value="horizontal poster" class="thumnail-type-opt" data-index="{{@index}}"> 가로 포스터
+														</label> <label class="radio-inline"> <input type="radio" name="optradio{{@index}}" value="still cut" class="thumnail-type-opt" data-index="{{@index}}"> 스틸컷
+														</label> <label class="radio-inline"> <input type="radio" name="optradio{{@index}}" value="event" class="thumnail-type-opt" data-index="{{@index}}"> 이벤트
+														</label> <label class="radio-inline"> <input type="radio" name="optradio{{@index}}" value="video" class="thumnail-type-opt" data-index="{{@index}}"> 영상
+														</label>
+													</div>
+												</div>
+											</div>
+
+										</div>
+
+									</div>
 
 
-							</div>
+
+									<div class="progress">
+										<div class="progress-bar" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100">
+											<!-- <span class="sr-only">70% Complete</span> -->
+										</div>
+									</div>
+
+								</li>
+							</ul>
+
 
 						</div>
-						<script>
-							var gnb_fileList = [];
-							$(function() {
-
-								$('#file-1').change(function(e) {
-									console.log($('#file-1').val());
-
-									var fileGroup = e.target.files;
-
-									console.log(e)
-									console.log(e.target.files)
-
-									var len = fileGroup.length;
-
-									for (var i = 0; i < len; i++) {
-										gnb_fileList.push(fileGroup[i]);
-									}
-
-									loadThumnailList(gnb_fileList);
-								});
-
-								Handlebars.registerHelper('if_eq', function(a, b, opts) {
-									if (a == b) return opts.fn(this);
-									else return opts.inverse(this);
-								});
-
-							});//
-
-							function loadThumnailList(fileList) {
-								var len = fileList.length;
-
-								var list_box = $('#file-list-group');
-								console.log(fileList);
-								ebox.setTemplate(list_box, $('#thumnail-list-item-template'), fileList);
-
-								//
-
-								for (var i = 0; i < len; i++) {
-
-									var _new_li = list_box.find('li[data-index="' + i + '"]');
-
-									var file = fileList[i];
-									var size = ebox.getFileSizeFormat(file);
-
-									var _new_img = ebox.setImagePreview($('<img/>', {
-										'class' : 'thumnail'
-									}), file);
-
-									var _thumnail_box = _new_li.find('.thumnail-box');
-									_thumnail_box.empty();
-									_thumnail_box.append(_new_img);
-
-									_new_li.find('.file-size').text(size);
-									_new_li.find('.file-name').text(file.name);
-
-								}
-
-							}
-						</script>
-
-						<script id="thumnail-list-item-template1" type="text/x-handlebars-template">
-
-
-</script>
-						<script id="thumnail-list-item-template" type="text/x-handlebars-template">
-{{#each.}}
-<li class="list-group-item" data-index="{{@index}}">
-
-	<div class="row">
-
-		<div class="pull-left col-xs-3">
-			<div class="thumnail-box" style="text-align: left;">
-				<img src="" class="thumnail" />
-			</div>
-		</div>
-
-	<div class="pull-left col-xs-7" style="text-align: left;">
-
-		<div class="row">
-
-			<div class="file-name-box">
-				<span>파일 이름</span> : <span class="file-name"></span>
-			</div>
-
-			<div class="file-size-box">
-				<span>파일 용량</span> : <span class="file-size"></span>
-			</div>
-
-			<div class="file-type-box">
-				<span>이미지 타입</span> :
-				<label class="radio-inline">
-					<input type="radio" name="optradio{{@index}}" value="poster" class="thumnail-type-opt" data-index="{{@index}}" {{#if_eq "poster" mtype}} checked {{/if_eq}}>
-						포스터
-				</label>
-				<label class="radio-inline">
-					<input type="radio" name="optradio{{@index}}" value="horizontal poster"  class="thumnail-type-opt" data-index="{{@index}}" {{#if_eq "horizontal poster" mtype}}  checked  {{/if_eq}}>
-						가로 포스터
-				</label>
-				<label class="radio-inline">
-					<input type="radio" name="optradio{{@index}}" value="still cut"  class="thumnail-type-opt" data-index="{{@index}}" {{#if_eq "still cut" mtype}}  checked  {{/if_eq}}>
-						스틸컷
-				</label>
-				<label class="radio-inline">
-					<input type="radio" name="optradio{{@index}}" value="event"  class="thumnail-type-opt" data-index="{{@index}}" {{#if_eq "event" mtype}}  checked  {{/if_eq}}>
-						이벤트
-				</label>
-				<label class="radio-inline">
-					<input type="radio" name="optradio{{@index}}" value="video"  class="thumnail-type-opt" data-index="{{@index}}" {{#if_eq "video" mtype}}  checked  {{/if_eq}}>
-						영상
-				</label>
-			
-			</div>
-
-		</div>
-
-	</div>
-
-	
-	<div class="pull-left col-xs-2" style="text-align: left;">
-		<div>
-<!--
-			<button type="button" class="btn btn-info btn-xs btn-thumnail-upload" data-index="{{@index}}">
-				<i class="fa fa-cloud-upload" aria-hidden="true"></i>
-			</button>
--->
-			<button type="button" class="btn btn-warning btn-xs btn-thumnail-cancel" data-index="{{@index}}">
-				<i class="fa fa-times" aria-hidden="true"></i>
-			</button>
-<!--
-			<button type="button" class="btn btn-danger btn-xs btn-thumnail-delete" data-index="{{@index}}" style="display: none">
-				<i class="fa fa-trash-o" aria-hidden="true"></i>
-			</button>
--->
-		</div>
-	</div>
-
-</div>
-
-
-	<div class="progress">
-		<div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100" style="width: 70%">
-			<span class="sr-only">70% Complete</span>
-		</div>
-	</div>
-
-</li>
-
-{{/each}}
-</script>
-
-
-
-
-						<div class="panel panel-basic col-xs-6">
-							<div class="panel-heading text-default">
-								<span class="title">영화데이터 입력</span>
-							</div>
-
-
-							<div class="panel-body " style="padding: 45px 15px;">
-								<!-- 여기에 영화 정보 입력 하면됨. -->
-								<div class="row">
-									<div class="form-group">
-										<label for="mNm">영화 검색</label><select class="js-data-example-ajax form-control"></select>
-										<p class="help-block text-fail">담당자를 입력해주세요.</p>
-									</div>
-
-									<div class="form-group">
-										<label for="mNm">영화제목 <span class="input-tip text-muted ">&nbsp;(한글)</span></label> <span class="help-txt help-inline pull-right"></span> <input type="text" name="mNm" id="mNm" class="form-control" value="${movie.mNm }">
-										<p class="help-block text-fail">담당자를 입력해주세요.</p>
-									</div>
-
-									<div class="form-group">
-										<label for="mNmEn">영화제목 <span class="input-tip text-muted ">&nbsp;(English)</span></label> <span class="help-txt help-inline pull-right"></span> <input type="text" name="mNmEn" id="mNmEn" class="form-control" value="${movie.mNmEn }">
-										<p class="help-block text-fail">담당자를 입력해주세요.</p>
-									</div>
-								</div>
-
-								<div class="row">
-									<div class="form-group col-xs-4" style="padding-left: 0;">
-										<label>감독</label> <input type="text" name="mDirector" id="mDirector" class="form-control" value="${movie.mdirector }">
-										<p class="help-block text-fail">담당자를 입력해주세요.</p>
-									</div>
-
-									<div class="form-group col-xs-8" style="padding-right: 0;">
-										<label>배우</label> <input type="text" name="mActors" id="mActors" class="form-control" value="${movie.mactors }">
-										<p class="help-block text-fail">담당자를 입력해주세요.</p>
-									</div>
-								</div>
-
-								<div class="row">
-									<div class="form-group col-xs-4" style="padding-left: 0;">
-										<label>개봉년도</label> <input type="text" name="mOpenDt" id="mOpenDt" class="form-control" value="${movie.mOpenDt }">
-										<p class="help-block text-fail">담당자를 입력해주세요.</p>
-									</div>
-
-									<div class="form-group col-xs-4">
-										<label>영화 시간</label> <input type="text" name="mShowTm" id="mShowTm" class="form-control" value="${movie.mshowTm }">
-										<p class="help-block text-fail">담당자를 입력해주세요.</p>
-									</div>
-
-									<div class="form-group col-xs-4" style="padding-right: 0;">
-										<label>관람등급</label> <input type="text" name="mWatchGradeNm" id="mWatchGradeNm" class="form-control" value="${movie.watchGradeNm }">
-										<p class="help-block text-fail">담당자를 입력해주세요.</p>
-									</div>
-								</div>
-								<div class="row">
-									<div class="form-group col-xs-6" style="padding-left: 0;">
-										<label>제작 국가</label> <input type="text" name="mNationNm" id="mNationNm" class="form-control" value="${movie.mnationNm }">
-										<p class="help-block text-fail">담당자를 입력해주세요.</p>
-									</div>
-									<div class="form-group col-xs-6" style="padding-right: 0;">
-										<label>장르</label> <input type="text" name="mGenreNm" id="mGenreNm" class="form-control" value="${movie.genreNm }">
-										<p class="help-block text-fail">담당자를 입력해주세요.</p>
-									</div>
-								</div>
-								<div class="row">
-									<div class="form-group">
-										<label>줄거리</label>
-										<textarea rows="15" name="mStory" id="mStory" class="form-control" style="width: 100%; padding: 30px;" wrap="hard">${movie.content }</textarea>
-										<p class="help-block text-fail">담당자를 입력해주세요.</p>
-									</div>
-								</div>
-							</div>
-						</div>
-
 
 					</div>
+					<script>
+						var gnb_fileList = [];
+						$(function() {
+
+							$('#file-1').change(function(e) {
+
+								var fileGroup = e.target.files;
+								var len = fileGroup.length;
+
+								for (var i = 0; i < len; i++) {
+									gnb_fileList.push(fileGroup[i]);
+								}
+
+								loadThumnailList(gnb_fileList);
+							});
+
+							Handlebars.registerHelper('if_eq', function(a, b, opts) {
+								if (a == b) return opts.fn(this);
+								else return opts.inverse(this);
+							});
+
+						});//
+
+						function loadThumnailList(fileList) {
+							var len = fileList.length;
+
+							var list_box = $('#file-list-group');
+							ebox.setTemplate(list_box, $('#thumnail-list-item-template'), fileList);
+
+							//
+
+							for (var i = 0; i < len; i++) {
+
+								var file = fileList[i];
+								var _new_li = list_box.find('li[data-index="' + i + '"]');
+
+								var size = ebox.getFileSizeFormat(file);
+								_new_li.find('.file-size').text(size);
+								_new_li.find('.file-name').text(file.name);
+
+								var _new_img = ebox.setImagePreview($('<img/>', {
+									'class' : 'thumnail'
+								}), file);
+
+								var _thumnail_box = _new_li.find('.thumnail-box');
+								_thumnail_box.empty();
+								_thumnail_box.append(_new_img);
+
+							}
+
+						}
+
+						$(document).on('click', '.btn-thumnail-cancel', function() {
+							gnb_fileList.splice($(this).data('index'), 1);
+							loadThumnailList(gnb_fileList);
+						});
+
+						$(document).on('change', '.thumnail-type-opt', function() {
+							var index = $(this).data('index');
+							var type = $(this).val();
+							gnb_fileList[index].mtype = type;
+						});
+					</script>
+
+					<script id="thumnail-list-item-template" type="text/x-handlebars-template">
+					{{#each.}}
+							<li class="list-group-item" data-index="{{@index}}">
+
+									<div class="row text-right">
+										<button type="button" class="btn btn-inverse text-bold btn-xs waves-effect waves-light btn-thumnail-cancel" data-index="{{@index}}">
+											<i class="fa fa-times" aria-hidden="true"></i>
+										</button>
+									</div>
+
+									<div class="row">
+
+										<div class="col-xs-2 " style="padding: 0;">
+											<div class="thumnail-box">
+												<img src="http://via.placeholder.com/100x100" class="thumnail" />
+											</div>
+										</div>
+
+										<div class="col-xs-10">
+											<div class="row">
+												<div class="file-name-box">
+													<span>파일 이름</span> : <span class="file-name text-fail text-bold"></span>
+												</div>
+											</div>
+
+											<div class="row">
+												<div class="file-size-box">
+													<span>파일 용량</span> : <span class="file-size text-fail text-bold"></span>
+												</div>
+											</div>
+
+											<div class="row" style="margin-top: 10px;">
+												<div class="file-type-box">
+													<span>이미지 타입</span> :
+													<div style="font-size: 12px; margin-top: 5px;">
+														<!-- 														<label class="radio-inline"> <input type="radio" name="optradio{{@index}}" value="poster" class="thumnail-type-opt" data-index="{{@index}}"> 포스터
+														</label> <label class="radio-inline"> <input type="radio" name="optradio{{@index}}" value="horizontal poster" class="thumnail-type-opt" data-index="{{@index}}"> 가로 포스터
+														</label> <label class="radio-inline"> <input type="radio" name="optradio{{@index}}" value="still cut" class="thumnail-type-opt" data-index="{{@index}}"> 스틸컷
+														</label> <label class="radio-inline"> <input type="radio" name="optradio{{@index}}" value="event" class="thumnail-type-opt" data-index="{{@index}}"> 이벤트
+														</label> <label class="radio-inline"> <input type="radio" name="optradio{{@index}}" value="video" class="thumnail-type-opt" data-index="{{@index}}"> 영상
+														</label> -->
+
+														<label class="radio-inline"> <input type="radio" name="optradio{{@index}}" value="poster" class="thumnail-type-opt" data-index="{{@index}}"{{#if_eq "poster" mtype}} checked {{/if_eq}}> 포스터
+														</label> <label class="radio-inline"> <input type="radio" name="optradio{{@index}}" value="horizontal poster" class="thumnail-type-opt" data-index="{{@index}}"{{#if_eq "horizontalposter" mtype}}  checked  {{/if_eq}}> 가로 포스터
+														</label> <label class="radio-inline"> <input type="radio" name="optradio{{@index}}" value="still cut" class="thumnail-type-opt" data-index="{{@index}}"{{#if_eq "stillcut" mtype}}  checked  {{/if_eq}}> 스틸컷
+														</label> <label class="radio-inline"> <input type="radio" name="optradio{{@index}}" value="event" class="thumnail-type-opt" data-index="{{@index}}"{{#if_eq "event" mtype}}  checked  {{/if_eq}}> 이벤트
+														</label> <label class="radio-inline"> <input type="radio" name="optradio{{@index}}" value="video" class="thumnail-type-opt" data-index="{{@index}}"{{#if_eq "video" mtype}}  checked  {{/if_eq}}> 영상
+														</label>
+													</div>
+												</div>
+											</div>
+
+										</div>
+
+									</div>
+
+
+
+									<div class="progress">
+										<div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100" style="width: 70%">
+											<span class="sr-only">70% Complete</span>
+										</div>
+									</div>
+
+								</li>
+					{{/each}}
+					</script>
+
+
+
+
+					<div class="panel panel-basic col-xs-6">
+						<div class="panel-heading text-default">
+							<span class="title">영화데이터 입력</span>
+						</div>
+
+
+						<div class="panel-body " style="padding: 45px 15px;">
+							<!-- 여기에 영화 정보 입력 하면됨. -->
+							<div class="row">
+								<div class="form-group">
+									<label for="movie_search">영화 검색</label>
+									<!--  -->
+									<select class="form-control" id="movie_search_by_API" name="movie_search"></select>
+									<p class="help-block text-fail">담당자를 입력해주세요.</p>
+								</div>
+
+								<div class="form-group">
+									<label for="mNm">영화제목 <span class="input-tip text-muted ">&nbsp;(한글)</span></label><span class="help-txt help-inline pull-right"></span>
+									<!--  -->
+									<input type="text" name="mNm" id="mNm" class="form-control" value="${movie.mNm }">
+									<p class="help-block text-fail">담당자를 입력해주세요.</p>
+								</div>
+
+								<div class="form-group">
+									<label for="mNmEn">영화제목 <span class="input-tip text-muted ">&nbsp;(English)</span></label><span class="help-txt help-inline pull-right"></span>
+									<!--  -->
+									<input type="text" name="mNmEn" id="mNmEn" class="form-control" value="${movie.mNmEn }">
+									<p class="help-block text-fail">담당자를 입력해주세요.</p>
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="form-group col-xs-4" style="padding-left: 0;">
+									<label>감독</label>
+									<!--  -->
+									<input type="text" name="mDirector" id="mDirector" class="form-control" value="${movie.mdirector }">
+									<p class="help-block text-fail">담당자를 입력해주세요.</p>
+								</div>
+
+								<div class="form-group col-xs-8" style="padding-right: 0;">
+									<label>배우</label>
+									<!--  -->
+									<input type="text" name="mActors" id="mActors" class="form-control" value="${movie.mactors }">
+									<p class="help-block text-fail">담당자를 입력해주세요.</p>
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="form-group col-xs-4" style="padding-left: 0;">
+									<label>개봉년도</label>
+									<!--  -->
+									<input type="text" name="mOpenDt" id="mOpenDt" class="form-control" value="${movie.mOpenDt }">
+									<p class="help-block text-fail">담당자를 입력해주세요.</p>
+								</div>
+
+								<div class="form-group col-xs-4">
+									<label>영화 시간</label>
+									<!--  -->
+									<input type="text" name="mShowTm" id="mShowTm" class="form-control" value="${movie.mshowTm }">
+									<p class="help-block text-fail">담당자를 입력해주세요.</p>
+								</div>
+
+								<div class="form-group col-xs-4" style="padding-right: 0;">
+									<label>관람등급</label>
+									<!--  -->
+									<input type="text" name="mWatchGradeNm" id="mWatchGradeNm" class="form-control" value="${movie.watchGradeNm }">
+									<p class="help-block text-fail">담당자를 입력해주세요.</p>
+								</div>
+							</div>
+							<div class="row">
+								<div class="form-group col-xs-6" style="padding-left: 0;">
+									<label>제작 국가</label>
+									<!--  -->
+									<input type="text" name="mNationNm" id="mNationNm" class="form-control" value="${movie.mnationNm }">
+									<p class="help-block text-fail">담당자를 입력해주세요.</p>
+								</div>
+								<div class="form-group col-xs-6" style="padding-right: 0;">
+									<label>장르</label>
+									<!--  -->
+									<input type="text" name="mGenreNm" id="mGenreNm" class="form-control" value="${movie.genreNm }">
+									<p class="help-block text-fail">담당자를 입력해주세요.</p>
+								</div>
+							</div>
+							<div class="row">
+								<div class="form-group">
+									<label>줄거리</label>
+									<textarea rows="15" name="mStory" id="mStory" class="form-control" style="resize: none;" wrap="hard">${movie.content }</textarea>
+									<p class="help-block text-fail">담당자를 입력해주세요.</p>
+								</div>
+							</div>
+						</div>
+					</div>
+
+
+					<!-- </div> -->
 				</div>
 				<!-- end of panel-group-wrapper -->
 			</form>
@@ -748,28 +701,6 @@
 
 	</div>
 </div>
-
-<!-- 
-	bg-primary 
-	bg-success 
-	bg-fail 
-	bg-info 
-	bg-warning 
-	bg-danger 
-	bg-inverse
-	bg-faded 
-	bg-default 
-	
-	text-primary 
-	text-success 
-	text-fail 
-	text-info 
-	text-warning 
-	text-danger 
-	text-inverse 
-	text-muted 
-	text-default 
- -->
 
 
 <%@ include file="../include/footer2.jsp"%>

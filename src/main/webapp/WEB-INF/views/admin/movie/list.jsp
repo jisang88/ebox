@@ -153,6 +153,7 @@
 				event.preventDefault();
 				console.log('btn-open-panel-1');
 				self.location = URL_MOVIE.WRITE;
+				//location.replace(URL_MOVIE.WRITE);
 			});
 
 			/*
@@ -283,7 +284,7 @@
 							</div>
 
 
-							<button type="button" class="btn bg-primary text-inverse pull-right waves-effect waves-light" id="btn-open-add-panel-1">
+							<button type="button" class="btn btn-primary text-bold pull-right waves-effect waves-light" id="btn-open-add-panel-1">
 								영화데이터 추가 <i class="fa fa-plus" aria-hidden="true"></i>
 							</button>
 
@@ -329,8 +330,8 @@
 											<td class="tbody-col-5">${!empty movie.mWatchGradeNm? movie.mWatchGradeNm:'-'}</td>
 											<td class="tbody-col-6">${!empty movie.mGenreNm? movie.mGenreNm:'-'}</td>
 											<td class="tbody-col-7">
-												<button class="btn bg-danger text-inverse btn-xs btn-update-in-row" data-pk="${movie.mNo}" ondblclick="return false;">수정</button>
-												<button class="btn bg-fail text-inverse btn-xs btn-delete-in-row" data-pk="${movie.mNo}" ondblclick="return false;">삭제</button>
+												<button class="btn btn-warning  btn-xs waves-effect waves-light btn-update-in-row" data-pk="${movie.mNo}" ondblclick="return false;">수정</button>
+												<button class="btn btn-danger  btn-xs waves-effect waves-light btn-delete-in-row" data-pk="${movie.mNo}" ondblclick="return false;">삭제</button>
 											</td>
 										</tr>
 									</c:forEach>
