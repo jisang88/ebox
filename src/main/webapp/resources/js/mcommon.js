@@ -1,13 +1,10 @@
 /**
- * 
  */
-
 var ebox = {
 
 	getFormData : function(form) {
 		return form.serialize();
 	},
-
 	/*
 	 * initData : function(fnc, param) { fnc(param.url, param); },
 	 */
@@ -193,14 +190,14 @@ var ebox = {
 
 	},
 
-	setHelpTextForInput_TextWithSpace : function($target) {
+	setHelpTextForInput_TextForVisibility : function($target) {
 
 		$target.focus();
-		$target.cloest('.form-group').find('.help-block').css('visibility', 'hidden');
+		$target.parent().find('.help-block').css('visibility', 'hidden');
 
 		//
 		if (!ebox.isValid($target.val())) {
-			$target.cloest('.form-group').find('.help-block').css('visibility', 'visible');
+			$target.parent().find('.help-block').css('visibility', 'visible');
 			return false;
 
 		} else {
@@ -209,6 +206,32 @@ var ebox = {
 
 	},
 
+	setHelpTextForInput_CheckBoxForVisibility : function($target) {
+
+		$target.parent().find('.help-block').css('visibility', 'hidden');
+
+		//
+		if ($target.find(':selected').length <= 0) {
+			$target.parent().find('.help-block').css('visibility', 'visible');
+			return false;
+
+		} else {
+			return true;
+		}
+	},
+	setHelpTextForInput_RadioForVisibility : function($target) {
+
+		$target.parent().find('.help-block').css('visibility', 'hidden');
+
+		//
+		if ($target.find(':checked').length <= 0) {
+			$target.parent().find('.help-block').css('visibility', 'visible');
+			return false;
+
+		} else {
+			return true;
+		}
+	},
 	setHelpTextForInput_Radio : function($target) {
 
 		$target.parent().find('.help-txt').hide();

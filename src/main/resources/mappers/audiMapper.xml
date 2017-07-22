@@ -162,9 +162,9 @@
 
 	<sql id="searchOne">
 		<where>
-			<if test="keyword != null">
+			<!-- <if test="keyword != null"> -->
 
-				audi.aName like concat('%',#{keyword},'%')
+				<!-- audi.aName like concat('%',#{keyword},'%')
 				or
 				audi.aSType like concat('%',#{keyword},'%')
 				or
@@ -176,9 +176,28 @@
 				or
 				audi.floor like concat('%',#{keyword},'%')
 				or
-				theater.tName like concat('%',#{keyword},'%')
+				theater.tName like concat('%',#{keyword},'%') -->
+				
+				<if test="searchType=='tn'.toString()">
+					theater.tName like concat('%',#{keyword},'%')
+				</if>
+				<if test="searchType=='an'.toString()">
+					audi.aName like concat('%',#{keyword},'%')
+				</if>
+				<if test="searchType=='fl'.toString()">
+					audi.floor like concat('%',#{keyword},'%')
+				</if>
+				<if test="searchType=='vt'.toString()">
+					audi.aVType like concat('%',#{keyword},'%')
+				</if>
+				<if test="searchType=='st'.toString()">
+					audi.aSType like concat('%',#{keyword},'%')
+				</if>
+				<if test="searchType=='at'.toString()">
+					audi.aTheme like concat('%',#{keyword},'%')
+				</if>
 
-			</if>
+			<!-- </if> -->
 		</where>
 	</sql>
 </mapper>

@@ -52,7 +52,7 @@ public class AdminAudiController {
 		model.addAttribute("pageMaker", pageMaker);
 
 		System.out.println("\n\n");
-		return "/admin/audi2";
+		return "/admin/audi";
 	}
 
 
@@ -137,6 +137,7 @@ public class AdminAudiController {
 		rttr.addFlashAttribute("result", "SUCCESS");
 		rttr.addAttribute("keyword", cri.getKeyword());
 		rttr.addAttribute("page", cri.getPage());
+		rttr.addAttribute("searchType", cri.getSearchType());
 
 		System.out.println("\n\n");
 		return "redirect:/admin/audi/list";

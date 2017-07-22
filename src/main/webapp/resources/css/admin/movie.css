@@ -2,16 +2,40 @@
 
 #panel-body-have-audi-table {min-height: 480px;}
 
-.help-block {visibility: hidden; margin-bottom: 0}
+.help-block {}
 .form-btn-group>button {width: 100px;}
 .form-btn-group {/* margin: 10px 0; */; margin: 20px 0;}
 .pagination {margin: 0 0 10px;}
 
 .col-sm-offset-1{margin-left: 8.33333333% !important;}
+
+.input-tip{
+  font-weight: normal;
+  font-size: 12px;
+}
+.modal-open {
+   overflow-y: scroll;
+}
+.modal-backdrop {background-color: transparent;} 
+.thumnail-box{
+	position: relative;
+    overflow: hidden;
+    padding-top: 100%;
+}
+.thumnail{    
+	position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    max-width: 100%;
+    height: auto;
+}
 /* .select2-container--bootstrap .select2-selection,
 .select2-container--bootstrap .select2-search--dropdown .select2-search__field
  {border-radius:2px !important;}
 .select2-container--bootstrap{width:100% !important;} */
+ 
 
 /* --------------------------------------------- */
 /* 테이블 */

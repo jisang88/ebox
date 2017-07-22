@@ -21,8 +21,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import kr.co.ebox.domain.Criteria;
 import kr.co.ebox.domain.ImageVO;
@@ -60,17 +62,71 @@ public class AdminMovieController {
 		System.out.println("Criteria\t" + cri);
 		System.out.println("PageMaker\t" + pageMaker);
 
-		cri.setPerPageNum(10);
 		pageMaker.setCri(cri);
-		pageMaker.setDisplayPageNum(5);
 		pageMaker.setTotalCnt(movieService.countPaging(cri));
 
 		model.addAttribute("movieList", movieService.readAll(cri));
 		model.addAttribute("pageMaker", pageMaker);
 
 		System.out.println("\n\n");
-		return "/admin/movieList";
+		return "/admin/movie/list";
 	}
+
+
+
+	@RequestMapping(value = "/delete", method = RequestMethod.POST)
+	public String movieDeletePOST(@RequestParam(value = "mNo[]") int[] arrNo, Criteria cri, RedirectAttributes rttr) throws Exception {
+
+		System.out.println("\n\n");
+		logger.info("AdminAudiController -> deletePOST....");
+		for (int i : arrNo) {
+			System.out.println(i);
+		}
+		movieService.remove(arrNo);
+
+		rttr.addFlashAttribute("result", "SUCCESS");
+		rttr.addAttribute("keyword", cri.getKeyword());
+		rttr.addAttribute("page", cri.getPage());
+		rttr.addAttribute("searchType", cri.getSearchType());
+
+		System.out.println("\n\n");
+		return "redirect:/admin/movie/list";
+	}
+
+
+
+	@RequestMapping(value = "/write", method = RequestMethod.GET)
+	public String movieWriteGET() throws Exception {
+
+		System.out.println("\n\n");
+		logger.info("AdminMovieController -> movieWriteGET....");
+		// System.out.println("Criteria\t" + cri);
+		// model.addAttribute("cri", cri);
+
+		System.out.println("\n\n");
+		return "/admin/movie/write";
+	}
+
+	/*
+	 * @ResponseBody
+	 * 
+	 * @RequestMapping(value = "/delete", method = RequestMethod.POST) public
+	 * ResponseEntity<String> movieDeletePOST(@RequestParam(value = "mNo[]")
+	 * int[] arrNo) {
+	 * 
+	 * System.out.println("\n\n"); logger.info(
+	 * "AdminAudiController -> deletePOST...."); ResponseEntity<String> entity =
+	 * null;
+	 * 
+	 * try { movieService.remove(arrNo); entity = new
+	 * ResponseEntity<>("SUCCESS", HttpStatus.OK);// 200
+	 * 
+	 * } catch (Exception e) { e.printStackTrace(); entity = new
+	 * ResponseEntity<>(HttpStatus.BAD_REQUEST);// 404 }
+	 * System.out.println("\n\n"); return entity;
+	 * 
+	 * }
+	 */
 
 
 
@@ -168,18 +224,18 @@ public class AdminMovieController {
 
 
 
-	@RequestMapping(value = "/write", method = RequestMethod.GET)
-	public String mainGET(Model model, PageMaker pageMaker, Criteria cri) throws Exception {
-
-		System.out.println("\n\n");
-		logger.info("AdminMovieController -> mainGET....");
-
-		System.out.println("\n\n");
-
-		return "/admin/movieWrite";
-	}
-
-
+	/*
+	 * @RequestMapping(value = "/write", method = RequestMethod.GET) public
+	 * String mainGET(Model model, PageMaker pageMaker, Criteria cri) throws
+	 * Exception {
+	 * 
+	 * System.out.println("\n\n"); logger.info(
+	 * "AdminMovieController -> mainGET....");
+	 * 
+	 * System.out.println("\n\n");
+	 * 
+	 * return "/admin/movieWrite"; }
+	 */
 
 	@ResponseBody
 	@RequestMapping(value = "/search", method = RequestMethod.GET)

@@ -34,6 +34,10 @@ public interface MovieService {
 
 
 
+	public void remove(int[] anoArr) throws Exception;
+
+
+
 	public List<MovieVO> readAll(Criteria cri) throws Exception;
 
 

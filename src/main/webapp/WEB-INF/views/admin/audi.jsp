@@ -1,344 +1,329 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
-<%@ include file="include/header.jsp"%>
+<%@ include file="include/header2.jsp"%>
 
-
-
-
-<link href="${pageContext.request.contextPath }/resources/css/admin/base.css" rel="stylesheet">
 <link href="${pageContext.request.contextPath }/resources/css/admin/audi.css" rel="stylesheet">
 
+<link href="${pageContext.request.contextPath }/resources/plugin/select2/select2.min.css" rel="stylesheet" />
+<link href="${pageContext.request.contextPath }/resources/plugin/select2/select2-bootstrap.min.css" rel="stylesheet" />
+<script src="${pageContext.request.contextPath }/resources/plugin/select2/select2.min.js"></script>
 
 <div id="page-wrapper">
 
-	<div class="container-fluid">
-
-
-		<!-- Page Heading -->
-		<div class="row">
-			<div class="col-lg-12">
-				<h1 class="page-header">
-					시설물 <small> <i class="fa fa-wifi" aria-hidden="true"></i> 상영관
-					</small>
-				</h1>
-			</div>
+	<!-- Page Heading -->
+	<div class="row">
+		<div class="col-xs-12">
+			<h1 class="page-header">시설물</h1>
 		</div>
-		<!-- /.row -->
+	</div>
+	<!-- /.row -->
 
-		<script type="text/javascript">
-			/* 
-				페이징 and keyowrd 는  no ajax & get 처리
-				수정 삭제는 ajax로 처리
-			
-			 */
+	<script type="text/javascript">
+		$(function() {
+			//var str = prompt("입력")
+			//alert(str.trim().replace(/\s\s/gi, ' '));
 
-			//전역 변수
 			var URL_AUDI = {
-
-				HOME : "${pageContext.request.contextPath }/admin/audi",
 				WRITE : "${pageContext.request.contextPath }/admin/audi/write",
 				LIST : "${pageContext.request.contextPath }/admin/audi/list",
 				DELETE : "${pageContext.request.contextPath }/admin/audi/delete",
 				UPDATE : "${pageContext.request.contextPath }/admin/audi/update",
 				READ : "${pageContext.request.contextPath }/admin/audi/read"
-
 			}
-			//--------------------------------------------------------------------
 
 			var URL_THEATER = {
-
 				READ : "${pageContext.request.contextPath }/admin/theater/read",
 				MATCH_NAME : "${pageContext.request.contextPath }/admin/theater/match/name",
 				SEARCH_LIKE_NAME : "${pageContext.request.contextPath }/admin/theater/search/name"
-
 			}
 
-			//--------------------------------------------------------------------
-
-			var audi_gnb_param = {
+			var CRITERIA = {
 				page : parseInt('${ pageMaker.cri.page}'),
+				searchType : '${ pageMaker.cri.searchType}',
 				keyword : '${ pageMaker.cri.keyword}'
 			};
 
 			//--------------------------------------------------------------------
-
-			function loadAudiList(url, param) {
-
-				ebox.loadList({
-					url : url,
-					param : param,
-					tableBox : $('#audi-table-body'),
-					template : $('#audi-list-template'),
-					pagingBox : $('#audi-list-pagination')
-				});
-
-			}
-			//--------------------------------------------------------------------
-
-			$(function() {
-				console.log(audi_gnb_param)
-
-				// 버튼 디바인 초기화
-				formBtnDesignToScreenWidth();
-
-			});
-			//--------------------------------------------------------------------
-
-			window.onresize = function() {
-
-				formBtnDesignToScreenWidth();
-
-			};
-
-			//--------------------------------------------------------------------
-
-			function formBtnDesignToScreenWidth() {
-
-				width = window.innerWidth || document.body.clientWidth;
-				if (width >= 1200 && width <= 1550) {
-
-					//$('.btngroup-Forwrite').css()
-					if ($('.btn-cancel-audi').hasClass('btn-block')) { return; }
-					console.log('screen width', window.innerWidth);
-					$('.btn-submit-audi').addClass('btn-block');
-					$('.btn-cancel-audi').addClass('btn-block');
-					$('.btn-update-complete-audi').addClass('btn-block');
-					$('.btn-update-cancel-audi').addClass('btn-block');
-
-				} else {
-					if (!$('.btn-cancel-audi').hasClass('btn-block')) { return; }
-					console.log('screen width', window.innerWidth);
-					$('.btn-submit-audi').removeClass('btn-block');
-					$('.btn-cancel-audi').removeClass('btn-block');
-					$('.btn-update-complete-audi').removeClass('btn-block');
-					$('.btn-update-cancel-audi').removeClass('btn-block');
-				}
-
-			};
-			//--------------------------------------------------------------------
-
-			function initForm1() {
-
-				$('.btn-cancel-audi').click();
-				$('.btngroup-Forwrite').show();
-				$('.btngroup-Forupdate').hide();
-
-			}
-
-			//--------------------------------------------------------------------
-
 			function setHelpText() {
 				//Input Text Check
-				if (!ebox.setHelpTextForInput_Text($('#tName'))) { return false; }
-				if (!ebox.setHelpTextForInput_Text($('#aName'))) { return false; }
-				if (!ebox.setHelpTextForInput_Text($('#floor'))) { return false; }
+				if (!ebox.setHelpTextForInput_TextForVisibility($('#tName'))) { return false; }
+				if (!ebox.setHelpTextForInput_TextForVisibility($('#aName'))) { return false; }
+				if (!ebox.setHelpTextForInput_TextForVisibility($('#floor'))) { return false; }
 
 				//Input Radio Check
-				if (!ebox.setHelpTextForInput_Radio($('#aVType'))) { return false; }
-				if (!ebox.setHelpTextForInput_Radio($('#aSType'))) { return false; }
-				if (!ebox.setHelpTextForInput_Radio($('#aTheme'))) { return false; }
-				if (!ebox.setHelpTextForInput_Radio($('#aThemeSubInfo'))) { return false; }
+				if (!ebox.setHelpTextForInput_RadioForVisibility($('#aVType'))) { return false; }
+				if (!ebox.setHelpTextForInput_RadioForVisibility($('#aSType'))) { return false; }
+
+				if (!ebox.setHelpTextForInput_CheckBoxForVisibility($('#aTheme'))) { return false; }
+
+				if (!ebox.setHelpTextForInput_RadioForVisibility($('#aThemeSubInfo'))) { return false; }
 
 				return true;
+			}
 
-			}//--------------------------------------------------------------------
+			/*
+			-------------------------------------------------------------------- 
+			
+				table controller 
+			
+			--------------------------------------------------------------------
+			 */
 
 			//
+			// table controller -> checkbox
+			//
+			$('#muti-select-1').change(function() {
+				event.preventDefault();
+				console.log('muti-select')
 
-			$(function() {
+				$(this).toggleClass('press');
 
-				//
-				$('.btn-cancel-audi').click(function() {
-					$('#aForm1 .help-txt').hide();
+				if ($(this).hasClass('press')) $('input.chk-box').prop('checked', true);
+				else $('input.chk-box').prop('checked', false);
+			});
+
+			//
+			// table controller -> delete
+			//
+			$('#btn-checked-delete').click(function() {
+				event.preventDefault();
+				console.log('btn-checked-delete')
+
+				var arr = [];
+				var $arrChbox = $('.chk-box:checked');
+
+				$arrChbox.each(function(i, elt) {
+					arr.push($(elt).val());
 				});
 
-				//--------------------------------------------------------------------
+				if (arr.length == 0) {
+					alert('선택된 항목이 없습니다.');
+					return;
+				}
 
-				$('.btn-update-cancel-audi').click(function() {
-					initForm1();
-				});
-				//--------------------------------------------------------------------
-
-				$('#btn-listAll').click(function() {
-					self.location = URL_AUDI.HOME;
-				});
-
-				////--------------------------------------------------------------------
-
-				$('.btn-muti-select').change(function() {
-					event.preventDefault();
-
-					$(this).toggleClass('press');
-
-					if ($(this).hasClass('press')) {
-						$('input.chk-box').prop('checked', true);
-
-					} else {
-						$('input.chk-box').prop('checked', false);
-					}
-
-				});
-
-				////--------------------------------------------------------------------
-
-				$('#btn-search-audi').click(function() {
-					event.preventDefault();
-
-					var txt = $('#txt-search-audi').val().trim();
-					if (!ebox.isValid(txt) || txt.length < 2) { return; }
-
-					audi_gnb_param.keyword = txt;
-					self.location = URL_AUDI.HOME + ebox.makeQuery(audi_gnb_param);
-
-				});
-
-				//--------------------------------------------------------------------
-
-				$('.btn-submit-audi').click(function(event) {
-					event.preventDefault();
-
-					if (!setHelpText()) { return; }
-
-					$.get(URL_THEATER.MATCH_NAME, {
-
-						tName : $('#tName').val()
-
-					}, function(data) {
-
-						if (!ebox.isValid(data)) {
-							alert('입력한 지점은 없는 지점입니다.');
-							return;
-
-						} else {
-
-							$('#tNo').val(data.tNo);
-
-							$('#aForm1').attr('action', URL_AUDI.WRITE);
-							$('#aForm1').submit();
-
-						}
-
-					});
-
-				});
-
-				////--------------------------------------------------------------------
-
-				$('.btn-update-complete-audi').click(function() {
-					event.preventDefault();
-
-					if (!setHelpText()) { return; }
-
-					//--------------------------------
-
-					$.get(URL_THEATER.MATCH_NAME, {
-						tName : $('#tName').val()
-					}, function(data) {
-
-						if (!ebox.isValid(data)) {
-							alert('입력한 지점은 없는 지점입니다.');
-							return;
-
-						} else {
-							$('#tNo').val(data.tNo);
-							console.log("tNo val - 2", $('#tNo').val());
-
-							$.post(URL_AUDI.UPDATE, ebox.getFormData($('#aForm1')), function(data) {
-
-								if (data == 'SUCCESS') {
-									initForm1();
-									loadAudiList(URL_AUDI.LIST, audi_gnb_param);
-								}
-
-							});
-
-						}
-
-					});
-
-				});//click
-
-				////--------------------------------------------------------------------
-
-				$('#btn-muti-remove').click(function() {
-					event.preventDefault();
-
-					var arr = [];
-					var $arrChbox = $('.chk-box:checked');
-
-					$arrChbox.each(function(i, elt) {
-						arr.push($(elt).val());
-					});
-
-					if (arr.length == 0) {
-						alert('선택된 항목이 없습니다.');
-						return;
-					}
-
-					//-----------------------------------
-
-					$.post(URL_AUDI.DELETE, {
-
-						aNo : arr
-
-					}, function(data) {
-
-						if ($('.btn-muti-select').hasClass('press')) $('.btn-muti-select').click();
-						if (data == 'SUCCESS') {
-							console.log("MULTI DELETE SUCCESS");
-							initForm1();
-							loadAudiList(URL_AUDI.LIST, audi_gnb_param);
-						}
-					});// end of $.post
-
-				});
+				$.post(URL_AUDI.DELETE, {
+					aNo : arr
+				}, function(data) {
+					console.log(data)
+					self.location = URL_AUDI.LIST + ebox.makeQuery(CRITERIA);
+				});// end of $.post
 
 			});
 
-			//--------------------------------------------------------------------
-			//--------------------------------------------------------------------
-
-			// Table row delete button 처리
-			$(document).on('click', '.btn-table-audi-row-delete', function() {
+			//
+			// table controller -> btn-all-list
+			//
+			$('#btn-all-list').click(function() {
 				event.preventDefault();
-				var $tr = $(this).parent().parent();
+				console.log('btn-all-list')
 
-				var arr = [];
-				arr.push($tr.find('.chk-box').val());
+				var display = $("#add-panel-1").css('display');
 
-				$.post(URL_AUDI.DELETE, {
+				if (display == 'none') {
+					self.location = URL_AUDI.LIST;
+				} else {
+					setTimeout(function() {
+						self.location = URL_AUDI.LIST;
+					}, 300);
+					$("#add-panel-1").collapse('hide');
+				}
 
-					aNo : arr
+			});
 
-				}, function(data) {
-
-					if (data == 'SUCCESS') {
-						initForm1();
-						loadAudiList(URL_AUDI.LIST, audi_gnb_param);
-						console.log("DELETE SUCCESS");
-					}
-
-				});
-
-			});//--------------------------------------------------------------------
-
-			// Table row update button 처리
-			$(document).on('click', '.btn-table-audi-row-update', function() {
+			//
+			// table controller -> btn-search-list
+			//
+			$('#btn-search-list').click(function() {
 				event.preventDefault();
+				console.log('search')
 
-				var $tr = $(this).parent().parent();
+				var $select_search_type = $('#searchType-1');
+
+				//시각 타입을 제외한 keyword 모두 소문자로 체인지
+				var keyword = $('#input-keyword-1').val().trim().replace(/\s\s/gi, ' ');
+				if ($select_search_type.val() == 'vt') {
+					keyword.toUpperCase();
+				} else {
+					keyword.toLowerCase();
+				}
+
+				CRITERIA.keyword = keyword;
+				CRITERIA.searchType = $('#searchType-1').val();
+
+				console.log(CRITERIA)
+				if (!ebox.isValid(CRITERIA.searchType)) {
+					alert('검색 기준을 선택해주세요.')
+					return;
+				}
+
+				if (!ebox.isValid(CRITERIA.keyword)) {
+					alert('검색어를 입력해주세요.')
+					return;
+				}
+
+				self.location = URL_AUDI.LIST + ebox.makeQuery(CRITERIA);
+			});
+
+			/*
+			----------------------------------------------------------------
+
+				'add-panel-1' open and close button 
+			
+			--------------------------------------------------------------------
+			 */
+
+			//
+			// 'add-panel-1' open button
+			//
+			$('#btn-open-add-panel-1').click(function() {
+				event.preventDefault();
+				console.log('btn-open-panel-1');
+				$("#add-panel-1").collapse('show');
+			});
+
+			//
+			// 'add-panel-1' close button
+			//
+
+			$('#btn-close-add-panel-1').click(function() {
+				event.preventDefault();
+				console.log('btn-close-add-panel-1');
+				$('.form-1-primary-key').val(0); // aNo 초기화
+				$('#btn-submit-form-1').attr('data-update', null); // submit 버튼 update 용에서 insert용으로 초기화
+				$("#add-panel-1").collapse('hide');
+				$('#btn-reset-form-1').click();
+			});
+
+			/*
+			----------------------------------------------------------------
+
+				form-1 event
+			
+			--------------------------------------------------------------------
+			 */
+
+			//
+			// form-1 submit button
+			//
+			$('#btn-submit-form-1').click(function() {
+				event.preventDefault();
+				console.log('btn-submit-form-1');
+
+				var $aName = $('#aName');
+				$aName.val($aName.val().trim().replace(/\s\s/gi, ' '));
+
+				var $floor = $('#floor');
+				$floor.val($floor.val().trim().replace(/\s\s/gi, ' '));
+
+				if (!setHelpText()) { return; }
+
+				var isUpdate = $(this).data('update');
+				var URL;
+
+				if (isUpdate) {
+					URL = URL_AUDI.UPDATE;
+				} else {
+					URL = URL_AUDI.WRITE;
+				}
+
+				setTimeout(function() {
+					$('#form-1').attr('action', URL);
+					$('#form-1').submit();
+				}, 300);
+
+				$("#add-panel-1").collapse('hide');
+			});
+
+			//
+			// form-1 reset button
+			//
+
+			$('#btn-reset-form-1').click(function() {
+				console.log('btn-reset-form-1');
+				$('#tName').empty(); // ${'#tNo'}는 btn-reset에 의해 자동 초기화 됨.
+				$('#form-1').find('.help-block').css('visibility', 'hidden');
+			});
+
+			//
+			// theater search and select 
+			//
+			$("#tName").select2({
+				placeholder : "검색 후 선택",
+				width : '100%',
+				theme : "bootstrap",
+				minimumInputLength : 2,
+				ajax : {
+					url : URL_THEATER.SEARCH_LIKE_NAME,
+					dataType : 'json',
+					delay : 300,
+					data : function(params) {
+						return {
+							keyword : params.term, // search term
+							page : params.page,
+						};
+					},
+					processResults : function(data, params) {
+						params.page = params.page || 1;
+						return {
+							results : $.map(data.list, function(vo) {
+								return {
+									id : vo.tNo,
+									text : vo.tName,
+								}
+							}),
+							pagination : {
+								more : (params.page * 10) < data.total
+							}
+						};
+					},
+					cache : true
+				}
+
+			}).on("select2:select", function(e) {
+				$('#tNo').val(e.params.data.id);
+			}).on('select2:close', function(e) {
+				$('#tName').focus();
+			});
+
+			/*
+			----------------------------------------------------------------
+
+				 buttons in table
+			
+			--------------------------------------------------------------------
+			 */
+
+			//
+			//  update buttons in row of table
+			//
+			$('.btn-update-in-row').click(function() {
+				event.preventDefault();
+				console.log('btn-update-in-row');
+
+				var $target = $(this);
+
+				if ($target.hasClass('press')) {
+					console.log('double')
+					return;
+				}
+				$target.addClass('press');
 
 				$.get(URL_AUDI.READ, {
-
-					aNo : $tr.find('.chk-box').val()
-
+					aNo : $target.data('pk')
 				}, function(data) {
 					console.log(data);
 
-					$('#tNo').val(data.theater.tNo);
-					$('#tName').val(data.theater.tName);
+					$('#btn-reset-form-1').click(); //form input 비우기 
+
+					try {
+						$('#tNo').val(data.theater.tNo);
+						$('#tName').append($('<option>' + data.theater.tName + '<option/>'));
+					} catch (e) {
+						console.log(e);
+					}
 
 					$('#aNo').val(data.aNo);
 					$('#aName').val(data.aName);
@@ -349,683 +334,400 @@
 					$('#aSType [name="aSType"][value="' + data.aSType + '"]').prop('checked', true);
 					$('#aThemeSubInfo [name="aThemeSubInfo"][value="' + data.aThemeSubInfo + '"]').prop('checked', true);
 
-					$('.btngroup-Forwrite').hide();
-					$('.btngroup-Forupdate').show();
+				}).done(function() {
+					$('#btn-submit-form-1').attr('data-update', true);
+					$('#btn-open-add-panel-1').click();
+				}).always(function() {
+					$target.removeClass('press');
+				});
 
-				})
-
-			})//--------------------------------------------------------------------
+			});
 
 			//
-
+			//  delete buttons in row of table
 			//
 
-			$(document).on('click', '#audi-list-pagination li a', function(event) {
+			$('.btn-delete-in-row').click(function() {
 				event.preventDefault();
+				console.log('btn-delete-in-row');
 
-				audi_gnb_param.page = $(this).attr('href').trim();
-				audi_gnb_param.keyword = $('#txt-search-audi').val().trim();
+				var $target = $(this);
+				if ($target.hasClass('press')) return;
+				$target.addClass('press');
 
-				self.location = URL_AUDI.HOME + ebox.makeQuery(audi_gnb_param);
+				$.post(URL_AUDI.DELETE, {
+					aNo : [ $(this).data('pk') ]
+				}, function(data) {
+					console.log('Table Item 1 Delete');
+					self.location = URL_AUDI.LIST + ebox.makeQuery(CRITERIA);
+				}).always(function() {
+					$target.removeClass('press');
+				});
 
-			});//--------------------------------------------------------------------
+			});
+
+			/*
+			----------------------------------------------------------------
+
+				그 밖에  이벤트 처리
+			
+			--------------------------------------------------------------------
+			 */
 
 			//
+			// search box enter key 처리
+			//
+			$('.input-search').keydown(function() {
+				if (event.keyCode == 13) {
+					$(this).parent().find('.btn-search').click();
+					return;
+				}
+			});
 
 			//
-		</script>
+			//  pagination
+			//
+			$('#pagination-1 a').click(function() {
+				event.preventDefault();
+				CRITERIA.page = $(this).attr('href').trim();
+				self.location = URL_AUDI.LIST + ebox.makeQuery(CRITERIA);
+			});
+
+		})
+	</script>
 
 
+	<div class="row">
+		<div class="col-xs-12">
 
-		<div class="row">
+			<form action="" id="form-1" method="post" autocomplete="off">
+				<div id="add-panel-1" class="collapse">
 
+					<div class="panel panel-basic">
 
-			<!-- --------------------------------- START OF LEFT COLUM-------------------------------------------- -->
-			<div class="col-lg-3">
+						<div class="panel-heading text-default">
+							<span class="title">지점 등록</span>
+							<!-- -->
+							<i class="fa fa-plus" aria-hidden="true"></i>
+							<button class="btn bg-primary text-inverse pull-right waves-effect waves-light" id="btn-close-add-panel-1">
+								닫기 <i class="fa fa-times" aria-hidden="true"></i>
+							</button>
+						</div>
 
-				<div class="panel panel-default">
-
-					<div class="panel-heading">
-						<h3 class="panel-title">
-							<i class="fa fa-long-arrow-right fa-fw"></i> 상영관 등록
-						</h3>
-					</div>
-
-					<form name="aForm1" autocomplete="off" id="aForm1" method="post">
 
 						<div class="panel-body ">
 
-							<input type="text" name="aNo" id="aNo" value="0" style="display: none">
-							<input type="text" name="tNo" id="tNo" value="0" style="display: none">
+							<div class="form-group-wrapper">
 
-							<div class="form-group">
-								<label class="">지점 이름</label>
-								<span class="help-txt help-inline pull-right">지점을 입력해주세요.</span>
-								<input type="text" name="tName" id="tName" class="form-control" placeholder="지점을 입력해주세요.">
-							</div>
+								<div class="row">
+									<div class="text-right col-xs-12">
+										<div class="form-btn-group">
+											<button type="button" class="btn bg-inverse text-inverse waves-effect waves-light" id="btn-submit-form-1">저장</button>
+											<button type="reset" class="btn btn-default waves-effect" id="btn-reset-form-1">입력취소</button>
+										</div>
+									</div>
+								</div>
+
+								<!-- input aNo -->
+								<input type="hidden" name="aNo" id="aNo" class="form-1-primary-key" value="0">
+								<!-- input tNo -->
+								<input type="text" name="tNo" id="tNo" class="form-1-foreign-key" value="0" style="display: none">
+								<!--  -->
+								<input type="hidden" name="page" value="${pageMaker.cri.page}" />
+
+								<c:if test="${!empty pageMaker.cri.keyword}">
+									<input type="hidden" name="keyword" value="${pageMaker.cri.keyword}" />
+								</c:if>
+								<c:if test="${!empty pageMaker.cri.searchType}">
+									<input type="hidden" name="searchType" value="${pageMaker.cri.searchType}" />
+								</c:if>
 
 
-							<div class="form-group">
-								<label>상영관 이름</label>
-								<span class="help-txt help-inline pull-right">상영관 이름을 입력해주세요.</span>
-								<input type="text" name="aName" id="aName" class="form-control" placeholder="Enter Text">
-							</div>
+								<div class="row">
 
-
-
-
-							<div class="form-group">
-								<label> 시각 타입 </label>
-								<span class="help-txt help-inline pull-right">시각 타입을 선택해주세요.</span>
-
-
-								<!-- aVType -->
-								<div class="col-md-offset-1" id="aVType">
-
-									<div class="radio">
-										<label>
-											<input type="radio" name="aVType" id="aVType-2D" value="2D">
-											2D <span class="add-tip  ">(Only)</span>
-										</label>
+									<div class="form-group col-xs-4">
+										<label class="">지점 이름</label>
+										<!--  -->
+										<select name="tName" id="tName" class="form-control"></select>
+										<p class="help-block text-fail">지점명을 입력해주세요.</p>
 									</div>
 
-									<div class="radio">
-										<label>
-											<input type="radio" name="aVType" id="aVType-3D" value="3D">
-											3D <span class="add-tip  ">(Only)</span>
-										</label>
+									<div class="form-group col-xs-4">
+										<label>상영관 이름 <span class="input-tip text-muted ">EX)&nbsp;&nbsp;1 (O)&nbsp;&nbsp;1관 (X)</span></label> <input type="text" name="aName" id="aName" class="form-control" placeholder="Enter Text">
+										<p class="help-block text-fail">담당자를 입력해주세요.</p>
 									</div>
 
-									<div class="radio">
-										<label>
-											<input type="radio" name="aVType" id="aVType-2DAnd3D" value="2D,3D">
-											2D & 3D
-										</label>
+									<div class="form-group  col-xs-4">
+										<label>위치 <span class="input-tip text-muted ">EX)&nbsp;&nbsp;B1 (O)&nbsp;&nbsp;B1층 (X)</span></label> <input type="text" name="floor" id="floor" class="form-control" placeholder="Enter Text">
+										<p class="help-block text-fail">담당자를 입력해주세요.</p>
 									</div>
 
 								</div>
-								<!-- End of aVType -->
 
 
-							</div>
 
 
-							<div class="form-group">
-								<label> 사운드 타입 </label>
-								<span class="help-txt help-inline pull-right">사운드 타입을 선택해주세요.</span>
+								<div class="row">
 
-								<!-- aSType -->
-								<div class="col-md-offset-1" id="aSType">
+									<!-- <div class="form-group col-xs-1"></div> -->
 
-									<div class="radio">
-										<label>
-											<input type="radio" name="aSType" id="aSType-normal" value="normal">
-											Normal <span class="add-tip  ">(Only)</span>
-										</label>
+									<div class="form-group col-xs-3">
+										<label> 시각 타입 </label>
+										<!-- aVType -->
+										<div class="col-sm-offset-1" id="aVType">
+
+											<div class="radio">
+												<label><input type="radio" name="aVType" id="aVType-2D" value="2D"> 2D <span class="add-tip  ">(Only)</span> </label>
+											</div>
+
+											<div class="radio">
+												<label><input type="radio" name="aVType" id="aVType-3D" value="3D"> 3D <span class="add-tip  ">(Only)</span> </label>
+											</div>
+
+											<div class="radio">
+												<label><input type="radio" name="aVType" id="aVType-2DAnd3D" value="2D, 3D"> 2D & 3D </label>
+											</div>
+
+										</div>
+										<!-- End of aVType -->
+										<p class="help-block text-fail">전화번호를 입력해주세요.</p>
 									</div>
 
-									<div class="radio">
-										<label>
-											<input type="radio" name="aSType" id="aSType-atmos" value="atmos">
-											ATMOS <span class="add-tip ">(Only)</span>
-										</label>
+
+									<div class="form-group col-xs-3">
+										<label> 사운드 타입 </label>
+										<!-- aSType -->
+										<div class="col-sm-offset-1" id="aSType">
+
+											<div class="radio">
+												<label><input type="radio" name="aSType" id="aSType-normal" value="normal"> Normal <span class="add-tip  ">(Only)</span> </label>
+											</div>
+
+											<div class="radio">
+												<label><input type="radio" name="aSType" id="aSType-atmos" value="atmos"> ATMOS <span class="add-tip ">(Only)</span> </label>
+											</div>
+
+											<div class="radio">
+												<label><input type="radio" name="aSType" id="aSType-normalAndAtmos" value="normal, atmos"> Normal & ATMOS </label>
+											</div>
+
+										</div>
+										<!-- End of aSType -->
+										<p class="help-block text-fail">주소-지번을 입력해주세요.</p>
 									</div>
 
-									<div class="radio">
-										<label>
-											<input type="radio" name="aSType" id="aSType-normalAndAtmos" value="normal,atmos">
-											Normal & ATMOS
-										</label>
+
+									<div class="form-group col-xs-3">
+										<label>테마</label>
+										<!-- -->
+										<select class="form-control" name="aTheme" id="aTheme" multiple size="4" onchange="ebox.setMutiSelectLimit(this)">
+											<option value="normal">Normal</option>
+											<option value="table">Table</option>
+											<option value="comfort">Comfort</option>
+											<option value="the boutique">The Boutique</option>
+											<option value="kids box">Kids Box</option>
+											<option value="barcony m">Barcony M</option>
+										</select>
+										<p class="help-block text-fail">주소-도로명을 입력해주세요.</p>
+									</div>
+
+
+									<div class="form-group col-xs-3">
+										<label>테마부가정보</label>
+
+										<div class="col-sm-offset-1" id="aThemeSubInfo">
+											<div class="radio">
+												<label><input type="radio" name="aThemeSubInfo" value=""> 없음 </label>
+											</div>
+
+											<div class="radio">
+												<label><input type="radio" name="aThemeSubInfo" value="suite"> Suite (The Boutique) </label>
+											</div>
+
+											<div class="radio">
+												<label><input type="radio" name="aThemeSubInfo" value="deluxe"> Deluxe (Barcony M)</label>
+											</div>
+										</div>
+										<p class="help-block text-fail">주소-지번을 입력해주세요.</p>
+
 									</div>
 
 
 								</div>
-								<!-- End of aSType -->
+								<!-- end of row -->
 
 							</div>
+							<!-- end of form-group-wrapper -->
+
+						</div>
+
+
+						<div class="panel-footer"></div>
+
+					</div>
+				</div>
+			</form>
 
 
 
-							<div class="form-group">
-								<label>테마</label>
-								<span class="help-txt help-inline pull-right">상영관 타입을 선택해주세요.</span>
-								<!-- -->
-								<select class="form-control" name="aTheme" id="aTheme" multiple size="3" onchange="ebox.setMutiSelectLimit(this)">
-									<option value="normal">Normal</option>
-									<option value="table">Table</option>
-									<option value="comfort">Comfort</option>
-									<option value="the boutique">The Boutique</option>
-									<option value="kids box">Kids Box</option>
-									<option value="barcony m">Barcony M</option>
+			<form action="" id="form-2" method="post" autocomplete="off">
 
+				<div class="panel-group">
+					<!-- panel - 1 -->
+					<div class="panel panel-basic">
+						<div class="panel-body " style="position: relative;">
+
+							<!-- ---------------------------- 버튼 체크박스 ---------------------------- -->
+							<div class="btn btn-default btn-allcheck waves-effect">
+								<label><input type="checkbox" id="muti-select-1" /> </label>
+							</div>
+							<!-- -------------------------------------- ---------------------------- -->
+
+
+							<button type="button" class="btn  btn-default waves-effect" id="btn-checked-delete">선택삭제</button>
+							<button type="button" class="btn  btn-default waves-effect" id="btn-all-list">전체보기</button>
+
+
+							<div class="ebox-input-group" style="margin-left: 20px;">
+								<select class="form-control" id="searchType-1">
+									<option value="" ${empty pageMaker.cri.searchType?'selected':'' } style="display: none">---</option>
+									<option value="tn" ${pageMaker.cri.searchType eq "tn"?'selected':'' }>지점명</option>
+									<option value="an" ${pageMaker.cri.searchType eq "an"?'selected':'' }>상영관 이름</option>
+									<option value="fl" ${pageMaker.cri.searchType eq "fl"?'selected':'' }>위치(층)</option>
+									<option value="vt" ${pageMaker.cri.searchType eq "vt"?'selected':'' }>시각 타입</option>
+									<option value="st" ${pageMaker.cri.searchType eq "st"?'selected':'' }>사운드 타입</option>
+									<option value="at" ${pageMaker.cri.searchType eq "at"?'selected':'' }>테마</option>
 								</select>
 							</div>
 
-							<div class="form-group aThemeSubInfo-box">
 
-								<label>테마부가정보</label>
 
-								<span class="help-txt help-inline pull-right">테마 부가정보를 선택해주세요.</span>
 
-								<div class="col-md-offset-1" id="aThemeSubInfo">
+							<div class="ebox-input-group has-icon">
+								<input type="text" class="form-control input-search" placeholder="Search" id="input-keyword-1" value="${pageMaker.cri.keyword }">
 
-									<div class="radio">
-										<label>
-											<input type="radio" name="aThemeSubInfo" value="">
-											없음
-										</label>
-									</div>
-									<div class="radio">
-										<label>
-											<input type="radio" name="aThemeSubInfo" value="suite">
-											Suite (The Boutique)
-										</label>
-									</div>
-									<div class="radio">
-										<label>
-											<input type="radio" name="aThemeSubInfo" value="deluxe">
-											Deluxe (Barcony M)
-										</label>
-									</div>
-
+								<div class="input-group-btn">
+									<button class="btn btn-default btn-search waves-effect" type="button" id="btn-search-list">
+										<i class="fa fa-search" aria-hidden="true"></i>
+									</button>
 								</div>
-
-
 							</div>
 
 
-
-
-							<div class="form-group">
-								<label>위치</label>
-								<span class="help-txt help-inline pull-right">상영관 위치(층)를 입력해주세요.</span>
-								<input type="text" name="floor" id="floor" class="form-control" placeholder="Enter Text">
-							</div>
-						</div>
-						<div class="panel-footer">
-							<div class="text-right form-controller-btngroup">
-
-								<div class="btngroup1-1 btngroup-Forwrite">
-									<button type="submit" class="btn btn-default btn-submit-audi btn-submit">저장</button>
-									<button type="reset" class="btn btn-default btn-cancel-audi">입력취소</button>
-								</div>
-
-								<div class="btngroup2-1 btngroup-Forupdate">
-									<button type="submit" class="btn btn-default btn-update-complete btn-update-complete-audi ">수정완료</button>
-									<button type="button" class="btn btn-primary btn-update-cancel-audi">수정취소</button>
-									<button type="reset" class="btn btn-default btn-cancel-audi">입력취소</button>
-								</div>
-
-
-
-
-							</div>
+							<button type="button" class="btn bg-primary text-inverse pull-right waves-effect waves-light" id="btn-open-add-panel-1">
+								지점 추가 <i class="fa fa-plus" aria-hidden="true"></i>
+							</button>
 
 						</div>
-					</form>
-
-				</div>
-
-
-			</div>
-
-			<!-- --------------------------------- END OF LEFT COLUM-------------------------------------------- -->
-
-
-			<div class="col-lg-9">
-
-
-				<div class="panel panel-default">
-
-					<div class="panel-heading">
-						<h3 class="panel-title">
-							<i class="fa fa-clock-o fa-fw"></i> 지점 리스트
-						</h3>
 					</div>
 
-					<div class="panel-body my-panel-body">
-
-						<div class="row table-control-btn-box">
-							<div class="col-lg-12">
-								<form class="form-inline">
-
-									<div class="btn-group table-btn-group">
-
-										<div class="input-group btn btn-default  btn-sm btn-with-checkbox btn-with-checkbox1">
-											<label style="font-weight: 400;">
-												<input type="checkbox" id="btn-muti-select" class="btn-muti-select" />
-												전체선택
-											</label>
-										</div>
-
-										<div class="input-group btn btn-default  btn-sm btn-with-checkbox btn-with-checkbox2">
-											<label style="font-weight: 400;">
-												<input type="checkbox" id="btn-muti-select" class="btn-muti-select" />
-											</label>
-										</div>
-
-										<button class="btn btn-danger btn-sm btn-muti-remove1" id="btn-muti-remove">선택삭제</button>
-										<button class="btn btn-danger btn-sm btn-muti-remove2" id="btn-muti-remove">삭제</button>
-
-										<button class="btn btn-default btn-sm " id="btn-listAll" type="button">전체보기</button>
-
-										<div class="input-group">
-											<input type="text" value="${pageMaker.cri.keyword }" name="keyword" class="form-control input-sm" placeholder="Search" id="txt-search-audi">
-											<div class="input-group-btn">
-												<button class="btn btn-default btn-sm" type="submit" id="btn-search-audi">
-													<i class="glyphicon glyphicon-search"></i>
-												</button>
-											</div>
-										</div>
-
-									</div>
-								</form>
-
-							</div>
-						</div>
 
 
+					<!-- panel - 2 -->
+					<div class="panel panel-basic">
+						<div class="panel-body " id="panel-body-have-audi-table">
 
 
-
-						<div>
-							<table class="table table-hover table-striped">
-								<thead>
-									<tr class="table-1-head-row">
-
-										<th>선택</th>
-										<th>지점명</th>
-										<th>상영관</th>
-										<th>시각타입</th>
-										<th>사운드 타입</th>
-										<th>테마</th>
-
-										<th>좌석수</th>
-										<th>위치</th>
-										<th></th>
-
+							<table class="table  table-striped">
+								<thead class="bg-inverse text-inverse ">
+									<tr>
+										<th class="thead-col-1">선택</th>
+										<th class="thead-col-2">지점명</th>
+										<th class="thead-col-3">상영관</th>
+										<th class="thead-col-4">시각타입</th>
+										<th class="thead-col-5">사운드 타입</th>
+										<th class="thead-col-6">테마</th>
+										<th class="thead-col-7">좌석수</th>
+										<th class="thead-col-8">위치</th>
+										<th class="thead-col-9"></th>
 									</tr>
 								</thead>
-
-								<tbody id="audi-table-body">
+								<tbody>
 
 									<c:forEach var="audi" items="${audiList}">
-										<tr class="table-1-body-row">
+										<tr>
 
-											<td><label>
-													<input type="checkbox" name="aNo" value="${audi.aNo}" class="chk-box">
-												</label></td>
-											<td><a data-toggle="modal" data-target="#modalTheater" onclick="modalTheater(this)" data-tno="${audi.theater.tNo}">${audi.theater.tName}</a></td>
-											<td><a data-toggle="modal" data-target="#modalAudi" onclick="modalAudi(this)">${audi.aName}</a></td>
-											<td>${audi.aVType.toUpperCase().replace(","," | ")}</td>
-											<td>${audi.aSType.toUpperCase().replace(","," | ")}</td>
-											<td>${audi.aTheme.toUpperCase()}<c:if test="${!empty audi.aThemeSubInfo}">-${audi.aThemeSubInfo.toUpperCase()}</c:if></td>
-											<td>300석</td>
-											<td>${audi.floor}</td>
-
-											<td><button class="btn btn-warning btn-xs btn-table-audi-row-update">수정</button>
-												<button class="btn btn-danger btn-xs btn-table-audi-row-delete">삭제</button></td>
+											<td class="tbody-col-1"><label><input type="checkbox" class="chk-box" name="aNo" value="${audi.aNo}"></label></td>
+											<td class="tbody-col-2"><a href="#">${!empty audi.theater.tName? audi.theater.tName:'-'}</a></td>
+											<td class="tbody-col-3">${!empty audi.aName? audi.aName:'-'}</td>
+											<td class="tbody-col-4">${!empty audi.aVType? audi.aVType.toUpperCase():'-'}</td>
+											<td class="tbody-col-5">${!empty audi.aSType? audi.aSType.toUpperCase():'-'}</td>
+											<%-- 											<td class="tbody-col-4">${!empty audi.aVType? audi.aVType.toUpperCase().replace(","," | "):'-'}</td>
+											<td class="tbody-col-5">${!empty audi.aSType? audi.aSType.toUpperCase().replace(","," | "):'-'}</td> --%>
+											<td class="tbody-col-6">${!empty audi.aTheme? audi.aTheme.toUpperCase():'-'}<c:if test="${!empty audi.aThemeSubInfo}">-${audi.aThemeSubInfo.toUpperCase()}</c:if></td>
+											<td class="tbody-col-7"><a href="#"> 100석</a></td>
+											<td class="tbody-col-8">${!empty audi.floor? audi.floor:'-'}</td>
+											<td class="tbody-col-9">
+												<button class="btn bg-danger text-inverse btn-xs btn-update-in-row" data-pk="${audi.aNo}" ondblclick="return false;">수정</button>
+												<button class="btn bg-fail text-inverse btn-xs btn-delete-in-row" data-pk="${audi.aNo}" ondblclick="return false;">삭제</button>
+											</td>
 										</tr>
 									</c:forEach>
-
 								</tbody>
 
 
+
 							</table>
+
 						</div>
 
+						<div class="panel-footer panel-footer-have-pagination-for-main-table">
+
+							<ul class="pagination pagination-sm " id="pagination-1">
+
+								<!-- pagination-sm -->
+								<c:if test="${pageMaker.prev }">
+									<li><a href="${pageMaker.startPage - 1}" class="waves-effect"><i class="fa fa-caret-left" aria-hidden="true"></i></a></li>
+								</c:if>
+
+								<c:forEach begin="${pageMaker.startPage }" end="${pageMaker.endPage}" var="idx">
+									<li class="${pageMaker.cri.page==idx?'active':'' }"><a href="${idx}" class="waves-effect ">${idx==0?"1":idx }</a></li>
+								</c:forEach>
+
+								<c:if test="${pageMaker.next}">
+									<li><a href="${pageMaker.endPage+1 }" class="waves-effect"><i class="fa fa-caret-right" aria-hidden="true"></i> </a></li>
+								</c:if>
+
+							</ul>
+
+
+
+
+						</div>
 
 					</div>
-					<div class="panel-footer pager-box">
 
-
-						<ul class="pagination pagination-sm" id="audi-list-pagination">
-
-
-							<c:if test="${pageMaker.prev }">
-								<li><a href="${pageMaker.startPage - 1}">
-										<i class="fa fa-caret-left" aria-hidden="true"></i>
-									</a></li>
-							</c:if>
-
-							<c:forEach begin="${pageMaker.startPage }" end="${pageMaker.endPage}" var="idx">
-								<li class="${pageMaker.cri.page==idx?'active':'' }"><a href="${idx} ">${idx==0?"1":idx }</a></li>
-							</c:forEach>
-
-							<c:if test="${pageMaker.next && pageMaker.endPage>0}">
-								<li><a href="${pageMaker.endPage+1 } ">
-										<i class="fa fa-caret-right" aria-hidden="true"></i>
-									</a></li>
-							</c:if>
-
-
-
-						</ul>
-
-
-					</div>
 
 				</div>
-			</div>
-		</div>
+			</form>
 
 
-
-
-
-
-
-	</div>
-	<!-- /.container-fluid -->
-
-</div>
-<!-- /#page-wrapper -->
-
-
-<!-- Modal -->
-<div id="modalAudi" class="modal fade" role="dialog">
-	<div class="modal-dialog">
-
-		<!-- Modal content-->
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal">&times;</button>
-				<h4 class="modal-title">상영관 상세정보</h4>
-			</div>
-			<div class="modal-body modal-audi">
-
-
-				<form class="form-horizontal col-md-10 col-md-offset-1">
-
-					<div class="form-group">
-						<label class="control-label col-sm-3 modal-label">지점 이름</label>
-						<div class="col-sm-9">
-							<span class="form-control modal-out-text"> <span class="modal-text" id="modal-tName"></span>
-							</span>
-						</div>
-					</div>
-
-					<div class="form-group  ">
-						<label class="control-label col-sm-3 modal-label">상영관 이름</label>
-						<div class="col-sm-9">
-							<span class="form-control modal-out-text"> <span class="modal-text" id="modal-aName"></span>
-							</span>
-						</div>
-					</div>
-
-					<div class="form-group  ">
-						<label class="control-label col-sm-3 modal-label">시각 타입</label>
-						<div class="col-sm-9">
-							<span class="form-control modal-out-text"> <span class="modal-text" id="modal-aVType"></span>
-							</span>
-						</div>
-					</div>
-
-					<div class="form-group  ">
-						<label class="control-label col-sm-3 modal-label">사운드 타입</label>
-						<div class="col-sm-9">
-							<span class="form-control modal-out-text"> <span class="modal-text" id="modal-aSType"></span>
-							</span>
-						</div>
-					</div>
-					<div class="form-group  ">
-						<label class="control-label col-sm-3 modal-label">테마</label>
-						<div class="col-sm-9">
-							<span class="form-control modal-out-text"> <span class="modal-text" id="modal-aTheme"></span>
-							</span>
-						</div>
-					</div>
-					<div class="form-group  ">
-						<label class="control-label col-sm-3 modal-label">테마부가정보</label>
-						<div class="col-sm-9">
-							<span class="form-control modal-out-text"> <span class="modal-text" id="modal-aThemeSubInfo"></span>
-							</span>
-						</div>
-					</div>
-					<div class="form-group  ">
-						<label class="control-label col-sm-3 modal-label">위치</label>
-						<div class="col-sm-9">
-							<span class="form-control modal-out-text"> <span class="modal-text" id="modal-floor"></span>
-							</span>
-						</div>
-					</div>
-					<div class="form-group  ">
-						<label class="control-label col-sm-3 modal-label">좌석 수</label>
-						<div class="col-sm-9">
-							<span class="form-control modal-out-text"> <span class="modal-text" id="modal-aSeatCnt"></span>
-							</span>
-						</div>
-					</div>
-
-				</form>
-
-
-
-
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-			</div>
 		</div>
 
 	</div>
 </div>
 
-
-
-<!-- Modal -->
-<div id="modalTheater" class="modal fade" role="dialog">
-	<div class="modal-dialog">
-
-		<!-- Modal content-->
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal">&times;</button>
-				<h4 class="modal-title">영화관 정보</h4>
-			</div>
-			<div class="modal-body modal-audi">
-
-
-				<form class="form-horizontal col-md-11 col-md-offset-1">
-
-					<div class="form-group">
-						<label class="control-label col-sm-2 modal-label">지점 이름</label>
-						<div class="col-sm-10">
-							<span class="form-control modal-out-text"> <span class="modal-text" id="modal-tName2"></span>
-							</span>
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="control-label col-sm-2 modal-label">지번</label>
-						<div class="col-sm-10">
-							<span class="form-control modal-out-text"> <span class="modal-text" id="modal-tAddrNum"></span>
-							</span>
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="control-label col-sm-2 modal-label">도로명</label>
-						<div class="col-sm-10">
-							<span class="form-control modal-out-text"> <span class="modal-text" id="modal-tAddrSt"></span>
-							</span>
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="control-label col-sm-2 modal-label">담당자</label>
-						<div class="col-sm-10">
-							<span class="form-control modal-out-text"> <span class="modal-text" id="modal-tManager"></span>
-							</span>
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="control-label col-sm-2 modal-label">전화번호</label>
-						<div class="col-sm-10">
-							<span class="form-control modal-out-text"> <span class="modal-text" id="modal-tTel"></span>
-							</span>
-						</div>
-					</div>
-
-
-
-				</form>
-
-
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-			</div>
-		</div>
-
-	</div>
-</div>
-
-
-
-
-
-<script type="text/javascript">
-	//----------------------------------AutoComplete-----------------------------------------
-	$(function() {
-
-		/* ---------------------------------------------------------------------------------- */
-
-		//  
-		// 	autocomplete 매개변수들 
-		/* ---------------------------------------------------------------------------------- */
-
-		// autocomplete 메뉴 아이템 선택시 선택된 아이템의 재 입력으로 메뉴 reopen 됨
-		// so, 이러한 반응을 방지하려면 임시 변수 하나 생성해서 source 함수에서 값 비교하여 reopen 방지함.
-		var autocomplete_temp;
-
-		// autocomplete source의 일부로서 ajax와 처리와 return 객체의 속성 이름이 달라 
-		// 외부에서 생성하여 함수로 전달하여 범용으로 쓸려고 함.
-
-		var autocomplete_ajax = function(req, res) {
-
-			$.get(URL_THEATER.SEARCH_LIKE_NAME, {
-
-				keyword : req.term.trim()
-
-			}, function(data) {
-				console.log(data)
-
-				res($.map(data.list, function(item) {
-					return {
-						label : item.tName,
-						value : item.tName,
-						tNo : item.tNo
-					};
-				}))// res
-
-			});//$.get
-
-		};
-
-		ebox.setAutoComplete($('#tName'), autocomplete_temp, autocomplete_ajax);
-
-		/* ---------------------------------------------------------------------------------- */
-
-	});
-	// Table row delete button 처리
-</script>
-
-<script>
-	$(function() {
-		Handlebars.registerHelper('toLowerCase', function(value) {
-			return (value && typeof value === 'string') ? value.toLowerCase() : '';
-		});
-
-		Handlebars.registerHelper('toUpperCase', function(value) {
-			return (value && typeof value === 'string') ? value.toUpperCase() : '';
-		});
-		Handlebars.registerHelper('changeComma', function(value) {
-			return value.replace(',', ' | ');
-		});
-
-	})
-
-	function modalAudi(target) {
-
-		var aNo = $(target).parent().parent().find('[name="aNo"]').val();
-		console.log('log', aNo)
-
-		if (ebox.isValid(aNo)) {
-			console.log('aNo isValid')
-		}
-
-		//
-
-		$.get(URL_AUDI.READ, {
-
-			aNo : aNo
-
-		}, function(data) {
-			console.log(data)
-
-			$('#modal-tName').text(data.theater.tName);
-			$('#modal-aName').text(data.aName);
-			$('#modal-aSType').text(data.aSType.toUpperCase().replace(",", " | "));
-			$('#modal-aVType').text(data.aVType.toUpperCase().replace(",", " | "));
-			$('#modal-aTheme').text(data.aTheme.toUpperCase());
-			$('#modal-aThemeSubInfo').text(data.aThemeSubInfo.toUpperCase());
-			$('#modal-floor').text(data.floor);
-		})
-
-	}
-
-	function modalTheater(target) {
-		console.log('modalTheater', $(target).data('tno'))
-
-		var tNo = $(target).data('tno');
-		if (ebox.isValid(tNo)) {
-			console.log('tNo isValid')
-		}
-
-		$.get(URL_THEATER.READ, {
-
-			tNo : tNo
-
-		}, function(data) {
-			console.log(data)
-
-			$('#modal-tName2').text(data.tName);
-			$('#modal-tAddrNum').text(data.tAddrNum);
-			$('#modal-tAddrSt').text(data.tAddrSt);
-			$('#modal-tManager').text(data.tManager);
-			$('#modal-tTel').text(data.tTel);
-
-		})
-
-	}
-</script>
-
-
-
-
-
-
-<script id="audi-list-template" type="text/x-handlebars-template">
-{{#each.}}
-<tr class="table-1-body-row">
-
-	<td><label><input type="checkbox" name="aNo" value="{{aNo }}" class="chk-box"></label></td>
-	<td><a data-toggle="modal" data-target="#modalTheater" onclick="modalTheater(this)" data-tNo="{{theater.tNo}}">{{theater.tName}}</a></td>
-	<td><a data-toggle="modal" data-target="#modalAudi" onclick="modalAudi(this)">{{aName}}</a></td>
-	<td>{{changeComma (toUpperCase aVType)}}</td>
-	<td>{{changeComma (toUpperCase aSType)}}</td>
-	<td>{{toUpperCase aTheme}}{{#if aThemeSubInfo}} - {{toUpperCase aThemeSubInfo}} {{/if}}</td>
-	<td>300석</td>
-	<td>{{floor}}</td>
-
-	<td><button class="btn btn-warning btn-xs btn-table-audi-row-update">수정</button>
-		<button class="btn btn-danger btn-xs btn-table-audi-row-delete">삭제</button></td>
-</tr>
-{{/each}}
-</script>
-
-
-
-
-
-
-<%@ include file="include/footer.jsp"%>
-
+<!-- 
+	bg-primary 
+	bg-success 
+	bg-fail 
+	bg-info 
+	bg-warning 
+	bg-danger 
+	bg-inverse
+	bg-faded 
+	bg-default 
+	
+	text-primary 
+	text-success 
+	text-fail 
+	text-info 
+	text-warning 
+	text-danger 
+	text-inverse 
+	text-muted 
+	text-default 
+ -->
+
+
+<%@ include file="include/footer2.jsp"%>

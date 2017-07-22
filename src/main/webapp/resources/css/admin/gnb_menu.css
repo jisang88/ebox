@@ -16,7 +16,8 @@ html, body {
 
 body {
 	position: relative;
-	background: #fafafa;
+	background: #f1f1f1;
+	/* background: #fafafa; */
 	overflow-y: scroll;
 }
 
@@ -162,7 +163,7 @@ START
 .btn.bg-inverse:FOCUS {
 	color: #cecece;
 }
-
+.btn.bg-faded{border-color: #ccc;}
 
 /* 
 ------------------------------------------------------
@@ -431,6 +432,10 @@ option {
   /* reset to left*/
 }
 .form-group-wrapper {
+	max-width: 1200px;
+	margin: 0 auto;
+}
+.panel-group-wrapper{
 	max-width: 1200px;
 	margin: 0 auto;
 }

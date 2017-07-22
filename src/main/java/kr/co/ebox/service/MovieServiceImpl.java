@@ -91,6 +91,18 @@ public class MovieServiceImpl implements MovieService {
 
 
 
+	@Transactional
+	@Override
+	public void remove(int[] noArr) throws Exception {
+
+		for (int no : noArr) {
+			movieDao.delete(no);
+			imageService.removeByMno(no);
+		}
+	}
+
+
+
 	@Override
 	public List<MovieVO> readAll(Criteria cri) throws Exception {
 

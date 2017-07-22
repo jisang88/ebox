@@ -154,7 +154,7 @@
 
 	<sql id="searchOne">
 		<where>
-			<if test="keyword != null">
+			<!-- <if test="keyword != null">
 
 				mNm like concat('%',#{keyword},'%')
 				or
@@ -169,8 +169,24 @@
 				mNationNm like concat('%',#{keyword},'%')
 				or
 				mGenreNm like concat('%',#{keyword},'%')
+				 -->
+				
+				<if test="searchType=='mn'.toString()">
+					mNm like concat('%',#{keyword},'%')
+					or
+					mNmEn like concat('%',#{keyword},'%')
+				</if>
+				<if test="searchType=='dn'.toString()">
+					mDirector like concat('%',#{keyword},'%')
+				</if>
+				<if test="searchType=='op'.toString()">
+					mOpenDt like concat('%',#{keyword},'%')
+				</if>
+				<if test="searchType=='g'.toString()">
+					mGenreNm like concat('%',#{keyword},'%')
+				</if>
 
-			</if>
+			<!-- </if> -->
 		</where>
 	</sql>
 	

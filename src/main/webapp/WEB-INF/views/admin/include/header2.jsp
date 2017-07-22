@@ -69,7 +69,7 @@
 
 				<li><a href="#" class="text-muted  sidebar-nav-parent-item">영화 관리 <span class="mark-arrow"><i class="fa fa-angle-down" aria-hidden="true"></i></span></a>
 					<ul id="sidebar-nav-item2" class=" sidebar-nav-item">
-						<li><a href="${pageContext.request.contextPath }/admin/movie" class="  text-muted ">영화데이터</a></li>
+						<li><a href="${pageContext.request.contextPath }/admin/movie/list" class="  text-muted ">영화데이터</a></li>
 						<li><a href="${pageContext.request.contextPath }/admin/screen" class="  text-muted ">스크린</a></li>
 					</ul></li>
 

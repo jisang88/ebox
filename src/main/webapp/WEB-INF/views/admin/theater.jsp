@@ -5,10 +5,7 @@
 
 <%@ include file="include/header2.jsp"%>
 
-
-<%--  <link href="${pageContext.request.contextPath }/resources/css/admin/base.css" rel="stylesheet"> 
---%>
-<link href="${pageContext.request.contextPath }/resources/css/admin/theater2.css" rel="stylesheet">
+<link href="${pageContext.request.contextPath }/resources/css/admin/theater.css" rel="stylesheet">
 <!-- 
 	bg-primary 
 	bg-success 
@@ -65,11 +62,11 @@
 			//--------------------------------------------------------------------
 			function setHelpText() {
 				//Input Text Check
-				if (!ebox.setHelpTextForInput_TextWithSpace($('#tName'))) { return false; }
-				if (!ebox.setHelpTextForInput_TextWithSpace($('#tManager'))) { return false; }
-				if (!ebox.setHelpTextForInput_TextWithSpace($('#tTel'))) { return false; }
-				if (!ebox.setHelpTextForInput_TextWithSpace($('#tAddrNum'))) { return false; }
-				if (!ebox.setHelpTextForInput_TextWithSpace($('#tAddrSt'))) { return false; }
+				if (!ebox.setHelpTextForInput_TextForVisibility($('#tName'))) { return false; }
+				if (!ebox.setHelpTextForInput_TextForVisibility($('#tManager'))) { return false; }
+				if (!ebox.setHelpTextForInput_TextForVisibility($('#tTel'))) { return false; }
+				if (!ebox.setHelpTextForInput_TextForVisibility($('#tAddrNum'))) { return false; }
+				if (!ebox.setHelpTextForInput_TextForVisibility($('#tAddrSt'))) { return false; }
 
 				return true;
 
@@ -203,6 +200,7 @@
 
 			$('#btn-reset-form-1').click(function() {
 				console.log('btn-reset-form-1');
+				$('#form-1').find('.help-block').css('visibility', 'hidden');
 			});
 
 			//----------------------------------------------------------------
