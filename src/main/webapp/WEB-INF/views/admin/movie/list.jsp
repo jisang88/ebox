@@ -35,6 +35,11 @@
 				UPDATE : "${pageContext.request.contextPath }/admin/movie/update",
 				READ : "${pageContext.request.contextPath }/admin/movie/read"
 			}
+			var URL_IMAGE = {
+				LIST : "${pageContext.request.contextPath }/admin/movie/image/list",
+				DELETE : "${pageContext.request.contextPath }/admin/movie/image/delete",
+				UPDATE : "${pageContext.request.contextPath }/admin/movie/image/update",
+			}
 
 			var CRITERIA = {
 				page : parseInt('${ pageMaker.cri.page}'),
@@ -179,6 +184,17 @@
 				}
 				$target.addClass('press');
 
+				var $mNo = $('<input/>', {
+					type : 'hidden',
+					name : 'mNo',
+					value : $(this).data('pk')
+				});
+
+				$('#form-1').prepend($mNo);
+				$('#form-1').attr('method', 'get');
+				$('#form-1').attr('action', URL_MOVIE.UPDATE);
+				$('#form-1').submit();
+
 			});
 
 			//
@@ -196,7 +212,31 @@
 				});
 
 				$('#form-1').prepend($mNo);
+				$('#form-1').attr('method', 'post');
 				$('#form-1').attr('action', URL_MOVIE.DELETE);
+				$('#form-1').submit();
+			});
+
+			$('.btn-img-update-in-row').click(function() {
+				event.preventDefault();
+
+				var $target = $(this);
+
+				if ($target.hasClass('press')) {
+					console.log('double')
+					return;
+				}
+				$target.addClass('press');
+
+				var $mNo = $('<input/>', {
+					type : 'hidden',
+					name : 'mNo',
+					value : $(this).data('pk')
+				});
+
+				$('#form-1').prepend($mNo);
+				$('#form-1').attr('method', 'get');
+				$('#form-1').attr('action', URL_IMAGE.LIST);
 				$('#form-1').submit();
 			});
 
@@ -242,6 +282,9 @@
 				<c:if test="${!empty pageMaker.cri.keyword}">
 					<input type="hidden" name="keyword" value="${pageMaker.cri.keyword}" />
 				</c:if>
+				<c:if test="${!empty pageMaker.cri.searchType}">
+					<input type="hidden" name="searchType" value="${pageMaker.cri.searchType}" />
+				</c:if>
 
 
 				<div class="panel-group">
@@ -261,7 +304,7 @@
 
 
 							<div class="ebox-input-group" style="margin-left: 20px;">
-								<select class="form-control" id="searchType-1" name="searchType">
+								<select class="form-control" id="searchType-1">
 									<option value="" ${empty pageMaker.cri.searchType?'selected':'' } style="display: none">---</option>
 									<option value="mn" ${pageMaker.cri.searchType eq "mn"?'selected':'' }>영화명</option>
 									<option value="dn" ${pageMaker.cri.searchType eq "dn"?'selected':'' }>감독</option>
@@ -317,7 +360,11 @@
 										<tr>
 
 											<td class="tbody-col-1"><label><input type="checkbox" class="chk-box" name="mNo" value="${movie.mNo}"></label></td>
-											<td class="tbody-col-2"><a href="#">${!empty movie.mNm? movie.mNm:'-'} <span>(${movie.mNmEn})</span></a></td>
+											<td class="tbody-col-2"><a href="#">${!empty movie.mNm? movie.mNm:'-'} <c:if test="${!empty movie.mNmEn }">
+														<span>(${movie.mNmEn})</span>
+													</c:if></a></td>
+
+
 											<td class="tbody-col-3">${!empty movie.mDirector? movie.mDirector:'-'}</td>
 
 											<c:if test="${!empty movie.mOpenDt }">
@@ -330,6 +377,7 @@
 											<td class="tbody-col-5">${!empty movie.mWatchGradeNm? movie.mWatchGradeNm:'-'}</td>
 											<td class="tbody-col-6">${!empty movie.mGenreNm? movie.mGenreNm:'-'}</td>
 											<td class="tbody-col-7">
+												<button class="btn btn-info  btn-xs waves-effect waves-light btn-img-update-in-row" data-pk="${movie.mNo}" ondblclick="return false;">이미지</button>
 												<button class="btn btn-warning  btn-xs waves-effect waves-light btn-update-in-row" data-pk="${movie.mNo}" ondblclick="return false;">수정</button>
 												<button class="btn btn-danger  btn-xs waves-effect waves-light btn-delete-in-row" data-pk="${movie.mNo}" ondblclick="return false;">삭제</button>
 											</td>

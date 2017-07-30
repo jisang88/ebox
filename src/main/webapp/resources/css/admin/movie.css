@@ -3,6 +3,8 @@
 #panel-body-have-audi-table {min-height: 480px;}
 
 .help-block {visibility: hidden;}
+.help-inline{visibility: hidden;}
+
 .form-btn-group>button {width: 100px;}
 .form-btn-group {/* margin: 10px 0; */; margin: 20px 0;}
 .pagination {margin: 0 0 10px;}
@@ -27,25 +29,22 @@
     max-width: 100%;
     height: auto;
 }
-.file-name-box{white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
 
+.file-name-box{white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+.list-group-item{position: relative;}
 .list-group-item:last-child {border-bottom-right-radius: 2px; border-bottom-left-radius: 2px;}
 .list-group-item:first-child {border-top-left-radius: 2px; border-top-right-radius: 2px;}
-
-.progress {
-	/* visibility:hidden; */
-	height: 5px;
-	margin-top: 5px;
-    margin-bottom: -10px; 
-    border-radius: 2px;
-    transition: all 2s;
-} 
-.progress-bar {
-    -webkit-transition: width 3s;
-    transition: all 2s;
+.list-group-item .upload-list-spin{
+	display:none; 
+	position: absolute;
+	top:50%;
+	left:50%;
+	margin-top:-15px;
+	margin-left:-15px;
+	font-size: 30px;
 }
- .file-type-box input[type=checkbox], .file-type-box input[type=radio]{margin: 1px -15px 0;}
 
+.file-type-box input[type=checkbox], .file-type-box input[type=radio]{margin: 1px -15px 0;}
 
 .select_list p{	margin-bottom: 0;}
 .select_list p:last-child{white-space: nowrap; text-overflow: ellipsis;  overflow: hidden;}
@@ -59,7 +58,9 @@
 .span_movieNm{font-weight: bold;}
 .span_movieNmEn{font-size:12px; margin-left:5px;}
 
-
+.file-type-box .radio-label{color: #0165ff;}
+.list-group-item .thumnail-video-box{padding-top:initial;}
+.list-group-item .thumnail-video{position:initial;}
 /* .btn-warning{
 	border-color: #ff9b00;
 }
@@ -70,8 +71,16 @@
 .select2-container--bootstrap .select2-search--dropdown .select2-search__field
  {border-radius:2px !important;}
 .select2-container--bootstrap{width:100% !important;} */
- 
 
+.flatpickr-calendar{
+	border-radius:2px !important;
+}
+#panel-wrapper-1{padding-bottom: 150px;}
+#update-page-box-1{
+	margin-top: 50px; padding-bottom: 100px
+}
+
+.list-group-wrap{padding: 45px 15px;}
 /* --------------------------------------------- */
 /* 테이블 */
 th, td {text-align: center;}

@@ -61,17 +61,18 @@ public class ImageServiceImpl implements ImageService {
 
 		ArrayList<ImageVO> images = new ArrayList<ImageVO>();
 		ImageVO vo;
+		String savedName;
+		String contentType;
 		Map<String, Object> map;
 
 		for (MultipartFile file : list) {
-
-			if (!file.getContentType().contains("image")) continue;
-			logger.info("originalName : " + file.getOriginalFilename());
-			logger.info("size : " + file.getSize() + "");
-			logger.info("contentType : " + file.getContentType());
+			contentType = file.getContentType();
+			if (!contentType.contains("image") && !contentType.contains("video")) continue;
 
 			vo = new ImageVO();
 			vo.setRefMno(movie.getmNo());
+			vo.setiName(file.getOriginalFilename());
+			vo.setiSize(file.getSize());
 
 			if (type.equals(ImageVO.TYPE_POSTER)) vo.setiType(ImageVO.TYPE_POSTER);
 			else if (type.equals(ImageVO.TYPE_H_POSTER)) vo.setiType(ImageVO.TYPE_H_POSTER);
@@ -85,7 +86,7 @@ public class ImageServiceImpl implements ImageService {
 			map.put("movie", movie);
 			map.put("type", type);
 
-			String savedName = UploadFileUtils.uploadFile(map);
+			savedName = UploadFileUtils.uploadFile(map);
 			vo.setiPath(savedName);
 
 			images.add(vo);
@@ -140,40 +141,27 @@ public class ImageServiceImpl implements ImageService {
 
 		ImageVO vo = read(no);
 		String filename = vo.getiPath();
-
 		String[] splitArray = filename.split("/");
-
 		int len = splitArray.length - 1;
 
 		for (int i = 0; i < splitArray.length - 1; i++) {
-			System.out.print("\n");
-			System.out.print("str\t" + splitArray[i]);
-			System.out.print("\n");
-			System.out.print("len\t" + splitArray[i].length());
-			System.out.print("\n");
+			System.out.print("str\t" + splitArray[i] + "\tlen\t" + splitArray[i].length());
 			len += splitArray[i].length();
 		}
+		System.out.println("\n total filename \t" + filename + "\t total filename len\t" + filename.length() + "\t total filename calc len\t" + len);
 
-		System.out.println();
-		System.out.println("total filename \t" + filename);
-		System.out.println("total filename len\t" + filename.length());
-		System.out.println("total filename calc len\t" + len);
 		String front = filename.substring(0, len);
 		String end = filename.substring(len + 2);
-
-		System.out.println();
-		System.out.print("front\t" + front);
-		System.out.print("end\t" + end);
+		System.out.print("\n front\t" + front + "\t end\t" + end + "\n");
 
 		System.out.println("-----------------------------------");
 		System.out.println(filename);
 		System.out.println(front + end);
 		System.out.println("-----------------------------------");
 
-		
 		// 썸네일 삭제
 		new File(uploadPath + front + end).delete();
-		
+
 		// 원본 삭제
 		new File(uploadPath + filename).delete();
 
@@ -187,20 +175,53 @@ public class ImageServiceImpl implements ImageService {
 
 		// mno로 불러와서 해당 경로 이미지 삭제 후 db에서 삭제
 		List<ImageVO> list = readAll(no);
+		if (list.size() == 0) return;
+
+		String filename = null;
+		String[] splitArray = null;
+		int len = 0;
 
 		for (ImageVO image : list) {
-			String filename = image.getiPath();
+			filename = image.getiPath();
+			splitArray = filename.split("/");
+			len = splitArray.length - 1;
 
-			String front = filename.substring(0, 12);
-			String end = filename.substring(14);
+			for (int i = 0; i < splitArray.length - 1; i++) {
+				System.out.print("str\t" + splitArray[i] + "\tlen\t" + splitArray[i].length());
+				len += splitArray[i].length();
+			}
+
+			System.out.println("\n total filename \t" + filename + "\t total filename len\t" + filename.length() + "\t total filename calc len\t" + len);
+
+			String front = filename.substring(0, len);
+			String end = filename.substring(len + 2);
+			System.out.print("\n front\t" + front + "\t end\t" + end + "\n");
+
+			System.out.println("-----------------------------------");
+			System.out.println(filename);
+			System.out.println(front + end);
+			System.out.println("-----------------------------------");
 
 			// 썸네일 삭제
 			new File(uploadPath + front + end).delete();
+
 			// 원본 삭제
 			new File(uploadPath + filename).delete();
+
 		}
 		// mno로 여러개 삭제
 		dao.deleteByMno(no);
+	}
+
+
+
+	@Transactional
+	@Override
+	public void removeByMno(int[] arrNo) throws Exception {
+
+		for (int no : arrNo) {
+			this.removeByMno(no);
+		}
 	}
 
 

@@ -159,7 +159,7 @@ use ebox;
 select * from tbl_movie_pm;
 delete from tbl_movie_pm;
 ALTER TABLE tbl_movie_pm AUTO_INCREMENT=1; 
-
+	
 
 -- 영화홍보
 DROP TABLE IF EXISTS tbl_movie_pm RESTRICT;
@@ -167,7 +167,9 @@ DROP TABLE IF EXISTS tbl_movie_pm RESTRICT;
 -- 영화홍보
 CREATE TABLE tbl_movie_pm (
 	iNo      INT         NOT NULL, -- 홍보물 번호
+	iName    TEXT        NULL,     -- 이름
 	iPath    TEXT        NULL,     -- 경로
+	iSize    BIGINT      NULL,     -- 사이즈
 	iRegdate DATETIME    NULL,     -- 등록날짜
 	iType    VARCHAR(20) NULL,     -- 홍보물 형태
 	refMno   INT         NULL      -- 영화번호
@@ -175,15 +177,14 @@ CREATE TABLE tbl_movie_pm (
 
 -- 영화홍보
 ALTER TABLE tbl_movie_pm
-	ADD CONSTRAINT PK_tbl_movie_promotion -- 영화홍보 기본키
+	ADD CONSTRAINT PK_tbl_movie_pm -- 영화홍보 기본키
 		PRIMARY KEY (
 			iNo -- 홍보물 번호
 		);
 
 ALTER TABLE tbl_movie_pm
 	MODIFY COLUMN iNo INT NOT NULL AUTO_INCREMENT;
-	
-	
+
 
 use ebox;
 select * from tbl_screen;

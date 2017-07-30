@@ -322,12 +322,29 @@ var ebox = {
 
 	setImagePreview : function($target, file) {
 		var reader = new FileReader();
-
 		reader.readAsDataURL(file);
+
 		reader.onload = function(e) {
 			$target.attr('src', e.target.result);
 		}
 		return $target;
+
+	},
+	setVideoPreview : function($target, file) {
+
+		// $target.attr('src', 'http://via.placeholder.com/100x100');
+		$target.css('position', 'initial');
+		$target.parent().css('padding-top', '0');
+		$target.parent().parent().css('width', '100%');
+
+		var fileUrl = window.URL.createObjectURL(file);
+
+		$target.attr('controls', 'controls');
+		var $source = $('<source/>');
+		$target.attr("src", fileUrl);
+
+		return $target;
+
 	}
 
 }

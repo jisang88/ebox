@@ -1,13 +1,18 @@
 package kr.co.ebox.controller;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -24,15 +29,18 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import kr.co.ebox.domain.Criteria;
+import kr.co.ebox.domain.FileVO;
 import kr.co.ebox.domain.ImageVO;
 import kr.co.ebox.domain.MovieVO;
 import kr.co.ebox.domain.PageMaker;
 import kr.co.ebox.service.ImageService;
 import kr.co.ebox.service.MovieService;
 import kr.co.ebox.util.MediaUtils;
+import kr.co.ebox.util.MultipartFileSender;
 
 /**
  * Handles requests for the application home page.
@@ -74,15 +82,16 @@ public class AdminMovieController {
 
 
 
+	@Transactional
 	@RequestMapping(value = "/delete", method = RequestMethod.POST)
 	public String movieDeletePOST(@RequestParam(value = "mNo[]") int[] arrNo, Criteria cri, RedirectAttributes rttr) throws Exception {
 
 		System.out.println("\n\n");
 		logger.info("AdminAudiController -> deletePOST....");
-		for (int i : arrNo) {
-			System.out.println(i);
-		}
+
+		// arrNo == mNo[]
 		movieService.remove(arrNo);
+		imageService.removeByMno(arrNo);
 
 		rttr.addFlashAttribute("result", "SUCCESS");
 		rttr.addAttribute("keyword", cri.getKeyword());
@@ -112,26 +121,31 @@ public class AdminMovieController {
 	@Transactional
 	@ResponseBody
 	@RequestMapping(value = "/write", method = RequestMethod.POST)
-	public ResponseEntity<String> writePOST2(List<MultipartFile> imglist, MovieVO movie) {
+	public ResponseEntity<String> movieWritePOST(FileVO file, MovieVO movie) {
 
 		System.out.println("\n\n");
-		logger.info("AdminMovieController -> writePOST2....");
-
-		System.out.println("\n");
-		System.out.println("MovieVO\t" + movie);
-
-		System.out.println("\n\n");
-		for (MultipartFile multipartFile : imglist) {
-			System.out.println(multipartFile.getName());// 해당 파일을 가지고 있는 변수 이름
-			System.out.println(multipartFile.getOriginalFilename()); // 파일 이름
-			System.out.println(multipartFile.getSize()); // 파일 사이즈
-			System.out.println(multipartFile.getContentType()); // 파일 타입
-			System.out.println("\n\n");
-		}
+		logger.info("AdminMovieController -> movieWritePOST....");
+		System.out.println("\nMovieVO\t\n\n" + movie);
 
 		ResponseEntity<String> entity = null;
-
 		try {
+			movieService.write(movie);
+			MovieVO vo = movieService.getLastRow();
+
+			if (isValid(file.getPosterList())) imageService.write(file.getPosterList(), ImageVO.TYPE_POSTER, vo);
+			else System.out.println("TYPE_POSTER File Upload Fail");
+
+			if (isValid(file.gethPosterList())) imageService.write(file.gethPosterList(), ImageVO.TYPE_H_POSTER, vo);
+			else System.out.println("TYPE_H_POSTER File Upload Fail");
+
+			if (isValid(file.getStillCutList())) imageService.write(file.getStillCutList(), ImageVO.TYPE_STILLCUT, vo);
+			else System.out.println("TYPE_STILLCUT File Upload Fail");
+
+			if (isValid(file.getEventList())) imageService.write(file.getEventList(), ImageVO.TYPE_EVENT, vo);
+			else System.out.println("TYPE_EVENT File Upload Fail");
+
+			if (isValid(file.getVideoList())) imageService.write(file.getVideoList(), ImageVO.TYPE_VIDEO, vo);
+			else System.out.println("TYPE_VIDEO File Upload Fail");
 
 			entity = new ResponseEntity<>("SUCCESS", HttpStatus.OK);// 200
 
@@ -143,41 +157,88 @@ public class AdminMovieController {
 		return entity;
 	}
 
-	/*
-	 * @Transactional
-	 * 
-	 * @RequestMapping(value = "/write", method = RequestMethod.POST) public
-	 * String movieWritePOST(List<MultipartFile> imgList, MovieVO movie) {
-	 * 
-	 * System.out.println("\n\n"); logger.info(
-	 * "AdminMovieController -> writePOST2....");
-	 * 
-	 * System.out.println("\n"); System.out.println("MovieVO\t" + movie);
-	 * System.out.println("imgList\t" + imgList.size());
-	 * 
-	 * System.out.println("\n\n"); return "redirect:/admin/movie/list"; }
-	 */
 
-	/*
-	 * @ResponseBody
-	 * 
-	 * @RequestMapping(value = "/delete", method = RequestMethod.POST) public
-	 * ResponseEntity<String> movieDeletePOST(@RequestParam(value = "mNo[]")
-	 * int[] arrNo) {
-	 * 
-	 * System.out.println("\n\n"); logger.info(
-	 * "AdminAudiController -> deletePOST...."); ResponseEntity<String> entity =
-	 * null;
-	 * 
-	 * try { movieService.remove(arrNo); entity = new
-	 * ResponseEntity<>("SUCCESS", HttpStatus.OK);// 200
-	 * 
-	 * } catch (Exception e) { e.printStackTrace(); entity = new
-	 * ResponseEntity<>(HttpStatus.BAD_REQUEST);// 404 }
-	 * System.out.println("\n\n"); return entity;
-	 * 
-	 * }
-	 */
+
+	@Transactional
+	@ResponseBody
+	@RequestMapping(value = "/image/write", method = RequestMethod.POST)
+	public ResponseEntity<String> imageWritePOST(FileVO file, int mNo) {
+
+		System.out.println("\n\n");
+		logger.info("AdminMovieController -> imageWritePOST....");
+		System.out.println("\n mNo \t" + mNo);
+
+		ResponseEntity<String> entity = null;
+
+		MovieVO vo = new MovieVO();
+
+		try {
+
+			if (mNo == 0) throw new Exception();
+			vo.setmNo(mNo);
+
+			if (isValid(file.getPosterList())) imageService.write(file.getPosterList(), ImageVO.TYPE_POSTER, vo);
+			else System.out.println("TYPE_POSTER File Upload Fail");
+
+			if (isValid(file.gethPosterList())) imageService.write(file.gethPosterList(), ImageVO.TYPE_H_POSTER, vo);
+			else System.out.println("TYPE_H_POSTER File Upload Fail");
+
+			if (isValid(file.getStillCutList())) imageService.write(file.getStillCutList(), ImageVO.TYPE_STILLCUT, vo);
+			else System.out.println("TYPE_STILLCUT File Upload Fail");
+
+			if (isValid(file.getEventList())) imageService.write(file.getEventList(), ImageVO.TYPE_EVENT, vo);
+			else System.out.println("TYPE_EVENT File Upload Fail");
+
+			if (isValid(file.getVideoList())) imageService.write(file.getVideoList(), ImageVO.TYPE_VIDEO, vo);
+			else System.out.println("TYPE_VIDEO File Upload Fail");
+
+			entity = new ResponseEntity<>("SUCCESS", HttpStatus.OK);// 200
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			entity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);// 404
+		}
+		System.out.println("\n\n");
+		return entity;
+	}
+
+
+
+	@RequestMapping(value = "/update", method = RequestMethod.GET)
+	public String movieModifyGET(Criteria cri, int mNo, Model model) throws Exception {
+
+		System.out.println("\n\n");
+		logger.info("AdminMovieController -> movieModifyGET....");
+		System.out.println("Criteria\t" + cri);
+		System.out.println("mNo\t" + mNo);
+		// model.addAttribute("cri", cri);
+
+		System.out.println(movieService.read(mNo));
+		model.addAttribute("movie", movieService.read(mNo));
+		System.out.println("\n\n");
+		return "/admin/movie/modify";
+	}
+
+
+
+	@RequestMapping(value = "/update", method = RequestMethod.POST)
+	public String movieModifyPOST(Criteria cri, MovieVO movie, RedirectAttributes rttr) throws Exception {
+
+		System.out.println("\n\n");
+		logger.info("AdminMovieController -> movieModifyGET....");
+		System.out.println("Criteria\t" + cri);
+		System.out.println("movie\t" + movie);
+
+		movieService.modify(movie);
+
+		rttr.addFlashAttribute("result", "SUCCESS");
+		rttr.addAttribute("keyword", cri.getKeyword());
+		rttr.addAttribute("page", cri.getPage());
+		rttr.addAttribute("searchType", cri.getSearchType());
+		System.out.println("\n\n");
+
+		return "redirect:/admin/movie/list";
+	}
 
 
 
@@ -192,101 +253,24 @@ public class AdminMovieController {
 		model.addAttribute("movie", movieService.read(mNo));
 		model.addAttribute("cri", cri);
 
-		model.addAttribute("posterList", imageService.readAll(mNo, ImageVO.TYPE_POSTER));
-		model.addAttribute("hPosterList", imageService.readAll(mNo, ImageVO.TYPE_H_POSTER));
-		model.addAttribute("stillCutList", imageService.readAll(mNo, ImageVO.TYPE_STILLCUT));
-		model.addAttribute("eventList", imageService.readAll(mNo, ImageVO.TYPE_EVENT));
-		model.addAttribute("videoList", imageService.readAll(mNo, ImageVO.TYPE_VIDEO));
+		model.addAttribute("list", imageService.readAll(mNo));
+		/*
+		 * model.addAttribute("hPosterList", imageService.readAll(mNo,
+		 * ImageVO.TYPE_H_POSTER)); model.addAttribute("stillCutList",
+		 * imageService.readAll(mNo, ImageVO.TYPE_STILLCUT));
+		 * model.addAttribute("eventList", imageService.readAll(mNo,
+		 * ImageVO.TYPE_EVENT)); model.addAttribute("videoList",
+		 * imageService.readAll(mNo, ImageVO.TYPE_VIDEO));
+		 * model.addAttribute("imageList", imageService.readAll(mNo,
+		 * ImageVO.TYPE_VIDEO));
+		 */
 
 		System.out.println("\n\n");
 
-		return "/admin/movieImage";
+		return "/admin/movie/movie_image";
 	}
 
 
-
-	@Transactional
-	@ResponseBody
-	@RequestMapping(value = "/image/write", method = RequestMethod.POST)
-	public ResponseEntity<String> imageWritePOST(List<MultipartFile> posterList, List<MultipartFile> hPosterList, List<MultipartFile> stillCutList, List<MultipartFile> eventList,
-			List<MultipartFile> videoList, int mNo) throws Exception {
-
-		System.out.println("\n\n");
-		logger.info("AdminMovieController -> imageWritePOST....");
-		ResponseEntity<String> entity = null;
-
-		try {
-
-			MovieVO vo = movieService.read(mNo);
-
-			if (isValid(posterList)) {
-				System.out.println("poster OK");
-				imageService.write(posterList, ImageVO.TYPE_POSTER, vo);
-
-			} else {
-				System.out.println("poster fail");
-			}
-
-			System.out.println("\n\n");
-			if (isValid(hPosterList)) {
-				System.out.println("poster OK");
-				imageService.write(hPosterList, ImageVO.TYPE_H_POSTER, vo);
-
-			} else {
-				System.out.println("poster fail");
-			}
-
-			System.out.println("\n\n");
-			if (isValid(stillCutList)) {
-				System.out.println("poster OK");
-				imageService.write(stillCutList, ImageVO.TYPE_STILLCUT, vo);
-
-			} else {
-				System.out.println("poster fail");
-			}
-
-			System.out.println("\n\n");
-
-			if (isValid(eventList)) {
-				System.out.println("photo OK");
-				imageService.write(eventList, ImageVO.TYPE_EVENT, vo);
-			} else {
-				System.out.println("photo fail");
-			}
-			System.out.println("\n\n");
-
-			if (isValid(videoList)) {
-				System.out.println("video OK");
-				imageService.write(videoList, ImageVO.TYPE_VIDEO, vo);
-			} else {
-				System.out.println("video fail");
-			}
-
-			entity = new ResponseEntity<>("SUCCESS", HttpStatus.OK);// 200
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			entity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);// 404
-		}
-		System.out.println("\n\n");
-		return entity;
-
-	}
-
-
-
-	/*
-	 * @RequestMapping(value = "/write", method = RequestMethod.GET) public
-	 * String mainGET(Model model, PageMaker pageMaker, Criteria cri) throws
-	 * Exception {
-	 * 
-	 * System.out.println("\n\n"); logger.info(
-	 * "AdminMovieController -> mainGET....");
-	 * 
-	 * System.out.println("\n\n");
-	 * 
-	 * return "/admin/movieWrite"; }
-	 */
 
 	@ResponseBody
 	@RequestMapping(value = "/search", method = RequestMethod.GET)
@@ -316,14 +300,18 @@ public class AdminMovieController {
 
 	@ResponseBody
 	@RequestMapping(value = "/image/delete", method = RequestMethod.POST)
-	public ResponseEntity<String> imageDeletePOST(int iNo) throws Exception {
+	public ResponseEntity<String> imageDeletePOST(@RequestParam(value = "iNo[]") int[] arrNo) throws Exception {
 
 		System.out.println("\n\n");
 		logger.info("AdminMovieController -> imageDeletePOST....");
 		ResponseEntity<String> entity = null;
 
 		try {
-			imageService.remove(iNo);
+			for (int iNo : arrNo) {
+				System.out.println("iNo\t" + iNo);
+				imageService.remove(iNo);
+			}
+
 			entity = new ResponseEntity<>("SUCCESS", HttpStatus.OK);// 200
 
 		} catch (Exception e) {
@@ -335,59 +323,6 @@ public class AdminMovieController {
 	}
 
 
-
-	/*
-	 * @Transactional
-	 * 
-	 * @ResponseBody
-	 * 
-	 * @RequestMapping(value = "/write", method = RequestMethod.POST) public
-	 * ResponseEntity<String> writePOST2(List<MultipartFile> posterList,
-	 * List<MultipartFile> hPosterList, List<MultipartFile> stillCutList,
-	 * List<MultipartFile> eventList, List<MultipartFile> videoList, MovieVO
-	 * movie) {
-	 * 
-	 * System.out.println("\n\n"); logger.info(
-	 * "AdminMovieController -> writePOST2....");
-	 * 
-	 * System.out.println("\n"); System.out.println("MovieVO\t" + movie);
-	 * 
-	 * ResponseEntity<String> entity = null;
-	 * 
-	 * try { movieService.write(movie); MovieVO vo = movieService.getLastRow();
-	 * if (isValid(posterList)) { System.out.println("poster OK");
-	 * imageService.write(posterList, ImageVO.TYPE_POSTER, vo);
-	 * 
-	 * } else { System.out.println("poster fail"); }
-	 * 
-	 * System.out.println("\n\n"); if (isValid(hPosterList)) {
-	 * System.out.println("poster OK"); imageService.write(hPosterList,
-	 * ImageVO.TYPE_H_POSTER, vo);
-	 * 
-	 * } else { System.out.println("poster fail"); }
-	 * 
-	 * System.out.println("\n\n"); if (isValid(stillCutList)) {
-	 * System.out.println("poster OK"); imageService.write(stillCutList,
-	 * ImageVO.TYPE_STILLCUT, vo);
-	 * 
-	 * } else { System.out.println("poster fail"); }
-	 * 
-	 * System.out.println("\n\n");
-	 * 
-	 * if (isValid(eventList)) { System.out.println("photo OK");
-	 * imageService.write(eventList, ImageVO.TYPE_EVENT, vo); } else {
-	 * System.out.println("photo fail"); } System.out.println("\n\n");
-	 * 
-	 * if (isValid(videoList)) { System.out.println("video OK");
-	 * imageService.write(videoList, ImageVO.TYPE_VIDEO, vo); } else {
-	 * System.out.println("video fail"); }
-	 * 
-	 * entity = new ResponseEntity<>("SUCCESS", HttpStatus.OK);// 200
-	 * 
-	 * } catch (Exception e) { e.printStackTrace(); entity = new
-	 * ResponseEntity<>(HttpStatus.BAD_REQUEST);// 404 }
-	 * System.out.println("\n\n"); return entity; }
-	 */
 
 	@ResponseBody
 	@RequestMapping("/displayFile")
@@ -409,7 +344,6 @@ public class AdminMovieController {
 			in = new FileInputStream(uploadPath + "/" + filename);
 
 			// IOUtils.toByteArray(in)
-
 			entity = new ResponseEntity<byte[]>(IOUtils.toByteArray(in), headers, HttpStatus.CREATED);
 		} catch (Exception e) {
 			entity = new ResponseEntity<byte[]>(HttpStatus.BAD_REQUEST);
@@ -457,6 +391,24 @@ public class AdminMovieController {
 
 
 
+	@RequestMapping(value = "/playFile", method = RequestMethod.GET)
+	public void getVideo(HttpServletRequest req, HttpServletResponse res, String filename) {
+
+		logger.info("동영상 스트리밍 요청 : " + filename);
+		File getFile = new File(uploadPath + filename);
+		System.out.println(getFile.toPath());
+
+		try {
+			// 미디어 처리
+			MultipartFileSender.fromFile(getFile).with(req).with(res).serveResource();
+		} catch (Exception e) {
+			// 사용자 취소 Exception 은 콘솔 출력 제외
+			if (!e.getClass().getName().equals("org.apache.catalina.connector.ClientAbortException")) e.printStackTrace();
+		}
+	}
+
+
+
 	public boolean isValid(List<MultipartFile> list) {
 
 		if (list != null) {
@@ -466,11 +418,19 @@ public class AdminMovieController {
 				System.out.println("ARRAY SIZE\t" + list.size());
 
 				for (MultipartFile multipartFile : list) {
-					System.out.println("\n");
-					System.out.println(multipartFile.getSize());
-					System.out.println(multipartFile.getContentType());
+
+					// 해당 파일을 가지고 있는 변수 이름
+					System.out.println(multipartFile.getName());
+
+					// 파일 이름
 					System.out.println(multipartFile.getOriginalFilename());
-					System.out.println("\n");
+
+					// 파일 사이즈
+					System.out.println(multipartFile.getSize());
+
+					// 파일 타입
+					System.out.println(multipartFile.getContentType());
+					System.out.println("\n\n");
 				}
 				return true;
 

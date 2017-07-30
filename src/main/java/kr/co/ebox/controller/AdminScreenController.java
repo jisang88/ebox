@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import kr.co.ebox.domain.Criteria;
 import kr.co.ebox.domain.MovieVO;
 import kr.co.ebox.domain.PageMaker;
-import kr.co.ebox.domain.ScheduleVO;
 import kr.co.ebox.domain.ScreenVO;
 import kr.co.ebox.service.ScreenService;
 
@@ -34,6 +34,27 @@ public class AdminScreenController {
 
 	@Inject
 	ScreenService screenService;
+
+
+
+	@RequestMapping(value = "/list", method = RequestMethod.GET)
+	public String screenListGET(Model model, PageMaker pageMaker, Criteria cri) throws Exception {
+
+		System.out.println("\n\n");
+		logger.info("AdminScreenController -> screenListGET....");
+		System.out.println("Criteria\t" + cri);
+		System.out.println("PageMaker\t" + pageMaker);
+
+		pageMaker.setCri(cri);
+		pageMaker.setTotalCnt(screenService.countPaging(cri));
+
+		model.addAttribute("screenList", screenService.readAll(cri));
+		model.addAttribute("pageMaker", pageMaker);
+
+		System.out.println("\n\n");
+
+		return "/admin/screen";
+	}
 
 
 

@@ -6,6 +6,8 @@ public class ImageVO {
 
 	int iNo;
 	String iPath;
+	String iName;
+	long iSize;
 	Date iRegdate;
 	String iType;
 	int refMno;
@@ -17,7 +19,7 @@ public class ImageVO {
 	public static final String TYPE_EVENT = "event";
 	public static final String TYPE_VIDEO = "video";
 
-	
+
 
 	public int getiNo() {
 
@@ -89,10 +91,38 @@ public class ImageVO {
 
 
 
+	public String getiName() {
+
+		return iName;
+	}
+
+
+
+	public void setiName(String iName) {
+
+		this.iName = iName;
+	}
+
+
+
+	public long getiSize() {
+
+		return iSize;
+	}
+
+
+
+	public void setiSize(long iSize) {
+
+		this.iSize = iSize;
+	}
+
+
+
 	@Override
 	public String toString() {
 
-		return "ImageVO [iNo=" + iNo + ", iPath=" + iPath + ", iRegdate=" + iRegdate + ", iType=" + iType + ", refMno=" + refMno + "]";
+		return "ImageVO [iNo=" + iNo + ", iPath=" + iPath + ", iName=" + iName + ", iSize=" + iSize + ", iRegdate=" + iRegdate + ", iType=" + iType + ", refMno=" + refMno + "]";
 	}
 
 }

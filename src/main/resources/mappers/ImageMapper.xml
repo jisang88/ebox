@@ -6,20 +6,16 @@
 
 <!-- 	   
 	
-	iNo      INT         NOT NULL,  홍보물 번호
-	iPath    TEXT        NULL,      경로
-	iRegdate DATETIME    NULL,      등록날짜
-	iType    VARCHAR(20) NULL,      홍보물 형태
-	refMno   INT         NULL       영화번호
+	
 
 -->
 
 	<insert id="insert" >
 
 		INSERT INTO
-			tbl_movie_pm ( iPath, iType, iRegdate, refMno	)
+			tbl_movie_pm ( iPath, iType, iRegdate, refMno, iName, iSize )
 		VALUES
-			( #{iPath}, #{iType}, NOW(), #{refMno})
+			( #{iPath}, #{iType}, NOW(), #{refMno}, #{iName}, #{iSize})
 
 	</insert>
 

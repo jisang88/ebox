@@ -61,8 +61,6 @@
 		
 	</select>
 	
-	
-
 	<select id="selectWithQnty" resultMap="ScreenResultMap" parameterType="int">
 	
 		SELECT
@@ -94,9 +92,10 @@
 		ORDER BY
 			scr.scrNo DESC
 		LIMIT
-			#{pageStart},#{perPageNum}
+			#{pageStart}, #{perPageNum}
 
 	</select>
+	
 	<select id="selectWithCriForInputList" resultMap="ScreenResultMap">
 
 		SELECT
@@ -111,7 +110,7 @@
 		ORDER BY
 			scr.scrNo DESC
 		LIMIT
-			#{pageStart},#{perPageNum}
+			#{pageStart}, #{perPageNum}
 
 	</select>
 	

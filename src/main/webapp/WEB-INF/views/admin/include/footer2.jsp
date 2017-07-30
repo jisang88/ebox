@@ -21,6 +21,8 @@
 <!-- My JS File -->
 <script src="${pageContext.request.contextPath }/resources/js/mcommon.js" type="text/javascript"></script>
 
+<!-- pace-1.0.2 -->
+<script src="${pageContext.request.contextPath }/resources/plugin/pace-1.0.2/pace.min.js"></script>
 
 </body>
 </html>

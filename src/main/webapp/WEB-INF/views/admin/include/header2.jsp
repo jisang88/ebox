@@ -29,10 +29,12 @@
 <!-- Ripple Effect -->
 <script src="${pageContext.request.contextPath }/resources/plugin/Waves-0.7.5/waves.min.js"></script>
 
+<!-- pace-1.0.2 -->
+<link href="${pageContext.request.contextPath }/resources/plugin/pace-1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet" type="text/css" />
 
 </head>
 <body>
-
+	<div class="mprogress"></div>
 	<div class="navbar-wrapper">
 		<nav class="navbar navbar-default">
 			<div class="container-fluid">
@@ -70,7 +72,7 @@
 				<li><a href="#" class="text-muted  sidebar-nav-parent-item">영화 관리 <span class="mark-arrow"><i class="fa fa-angle-down" aria-hidden="true"></i></span></a>
 					<ul id="sidebar-nav-item2" class=" sidebar-nav-item">
 						<li><a href="${pageContext.request.contextPath }/admin/movie/list" class="  text-muted ">영화데이터</a></li>
-						<li><a href="${pageContext.request.contextPath }/admin/screen" class="  text-muted ">스크린</a></li>
+						<li><a href="${pageContext.request.contextPath }/admin/screen/list" class="  text-muted ">스크린</a></li>
 					</ul></li>
 
 				<li><a href="#" class="text-muted  sidebar-nav-parent-item">영업 관리<span class="mark-arrow"><i class="fa fa-angle-down" aria-hidden="true"></i></span></a>

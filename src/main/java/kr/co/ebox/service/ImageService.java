@@ -36,6 +36,10 @@ public interface ImageService {
 
 
 
+	public void removeByMno(int[] no) throws Exception;
+
+
+
 	public List<ImageVO> readAll(int mNo) throws Exception;
 
 

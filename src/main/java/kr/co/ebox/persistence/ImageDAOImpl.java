@@ -1,6 +1,5 @@
 package kr.co.ebox.persistence;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,11 +69,7 @@ public class ImageDAOImpl implements ImageDAO {
 	@Override
 	public List<ImageVO> selectAll(int mNo) {
 
-		try {
-			return session.selectList(namespace + ".selectAll", mNo);
-		} catch (Exception e) {
-			return Collections.EMPTY_LIST;
-		}
+		return session.selectList(namespace + ".selectAll", mNo);
 
 	}
 
